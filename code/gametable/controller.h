@@ -15,11 +15,10 @@
 #define CONTROLLER_PIN_SRBUTTONS_DATA         4
 
 // Bit positions for buttons and lights.
-// TODO: Add correct bit numbers
-#define CONTROLLER_PLAYER_BIT_UP    3
-#define CONTROLLER_PLAYER_BIT_DOWN  2
-#define CONTROLLER_PLAYER_BIT_LEFT  1
-#define CONTROLLER_PLAYER_BIT_RIGHT 0
+#define CONTROLLER_BIT_UP    3
+#define CONTROLLER_BIT_DOWN  2
+#define CONTROLLER_BIT_LEFT  1
+#define CONTROLLER_BIT_RIGHT 0
 
 // Light states.
 #define CONTROLLER_LIGHT_STATE_OFF          0

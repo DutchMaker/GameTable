@@ -63,32 +63,32 @@ void Controller::update_buttons()
                                           // Player 2 buttons are bits 0 to 3
 
     // Read button states.
-    bool up = bitRead(data, CONTROLLER_PLAYER_BIT_UP + bitshift) == 0;
-    bool down = bitRead(data, CONTROLLER_PLAYER_BIT_DOWN + bitshift) == 0;
-    bool left = bitRead(data, CONTROLLER_PLAYER_BIT_LEFT + bitshift) == 0;
-    bool right = bitRead(data, CONTROLLER_PLAYER_BIT_RIGHT + bitshift) == 0;
+    bool up = bitRead(data, CONTROLLER_BIT_UP + bitshift) == 0;
+    bool down = bitRead(data, CONTROLLER_BIT_DOWN + bitshift) == 0;
+    bool left = bitRead(data, CONTROLLER_BIT_LEFT + bitshift) == 0;
+    bool right = bitRead(data, CONTROLLER_BIT_RIGHT + bitshift) == 0;
 
     // TODO: Check last button state PER BUTTON.
 
     // Add pressed buttons to queue.
-    if (up && (_queue_length[player] == 0 || _queue[player][_queue_length[player] - 1] != CONTROLLER_PLAYER_BIT_UP))
+    if (up && (_queue_length[player] == 0 || _queue[player][_queue_length[player] - 1] != CONTROLLER_BIT_UP))
     {
-      _queue[player][_queue_length[player]++] = CONTROLLER_PLAYER_BIT_UP;
+      _queue[player][_queue_length[player]++] = CONTROLLER_BIT_UP;
     }
 
-    if (down && (_queue_length[player] == 0 || _queue[player][_queue_length[player] - 1] != CONTROLLER_PLAYER_BIT_DOWN))
+    if (down && (_queue_length[player] == 0 || _queue[player][_queue_length[player] - 1] != CONTROLLER_BIT_DOWN))
     {
-      _queue[player][_queue_length[player]++] = CONTROLLER_PLAYER_BIT_DOWN;
+      _queue[player][_queue_length[player]++] = CONTROLLER_BIT_DOWN;
     }
 
-    if (left && (_queue_length[player] == 0 || _queue[player][_queue_length[player] - 1] != CONTROLLER_PLAYER_BIT_LEFT))
+    if (left && (_queue_length[player] == 0 || _queue[player][_queue_length[player] - 1] != CONTROLLER_BIT_LEFT))
     {
-      _queue[player][_queue_length[player]++] = CONTROLLER_PLAYER_BIT_LEFT;
+      _queue[player][_queue_length[player]++] = CONTROLLER_BIT_LEFT;
     }
 
-    if (right && (_queue_length[player] == 0 || _queue[player][_queue_length[player] - 1] != CONTROLLER_PLAYER_BIT_RIGHT))
+    if (right && (_queue_length[player] == 0 || _queue[player][_queue_length[player] - 1] != CONTROLLER_BIT_RIGHT))
     {
-      _queue[player][_queue_length[player]++] = CONTROLLER_PLAYER_BIT_RIGHT;
+      _queue[player][_queue_length[player]++] = CONTROLLER_BIT_RIGHT;
     }
   }
 
@@ -200,22 +200,22 @@ void Controller::update_lights()
     {
       if (_player_light_state[player] == CONTROLLER_LIGHT_STATE_BLINK_UP || _player_light_state[player] == CONTROLLER_LIGHT_STATE_BLINK_ALL)
       {
-        bitWrite(data, CONTROLLER_PLAYER_BIT_UP + bitshift, (_player_light_blink_state[player] ? 0 : 1));
+        bitWrite(data, CONTROLLER_BIT_UP + bitshift, (_player_light_blink_state[player] ? 0 : 1));
       }
 
       if (_player_light_state[player] == CONTROLLER_LIGHT_STATE_BLINK_DOWN || _player_light_state[player] == CONTROLLER_LIGHT_STATE_BLINK_ALL)
       {
-        bitWrite(data, CONTROLLER_PLAYER_BIT_DOWN + bitshift, (_player_light_blink_state[player] ? 0 : 1));
+        bitWrite(data, CONTROLLER_BIT_DOWN + bitshift, (_player_light_blink_state[player] ? 0 : 1));
       }
 
       if (_player_light_state[player] == CONTROLLER_LIGHT_STATE_BLINK_LEFT || _player_light_state[player] == CONTROLLER_LIGHT_STATE_BLINK_ALL)
       {
-        bitWrite(data, CONTROLLER_PLAYER_BIT_LEFT + bitshift, (_player_light_blink_state[player] ? 0 : 1));
+        bitWrite(data, CONTROLLER_BIT_LEFT + bitshift, (_player_light_blink_state[player] ? 0 : 1));
       }
 
       if (_player_light_state[player] == CONTROLLER_LIGHT_STATE_BLINK_RIGHT || _player_light_state[player] == CONTROLLER_LIGHT_STATE_BLINK_ALL)
       {
-        bitWrite(data, CONTROLLER_PLAYER_BIT_RIGHT + bitshift, (_player_light_blink_state[player] ? 0 : 1));
+        bitWrite(data, CONTROLLER_BIT_RIGHT + bitshift, (_player_light_blink_state[player] ? 0 : 1));
       }
 
       _player_light_blink_state[player] = !_player_light_blink_state[player];
@@ -226,25 +226,25 @@ void Controller::update_lights()
     {
       if (_player_light_twirl_state[player] == 0)
       {
-        bitWrite(data, CONTROLLER_PLAYER_BIT_UP + bitshift, 1);
-        bitWrite(data, CONTROLLER_PLAYER_BIT_DOWN + bitshift, 0);
-        bitWrite(data, CONTROLLER_PLAYER_BIT_LEFT + bitshift, 0);
-        bitWrite(data, CONTROLLER_PLAYER_BIT_RIGHT + bitshift, 0);
+        bitWrite(data, CONTROLLER_BIT_UP + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_DOWN + bitshift, 0);
+        bitWrite(data, CONTROLLER_BIT_LEFT + bitshift, 0);
+        bitWrite(data, CONTROLLER_BIT_RIGHT + bitshift, 0);
       }
       else if (_player_light_twirl_state[player] == 1)
       {
-        bitWrite(data, CONTROLLER_PLAYER_BIT_UP + bitshift, 0);
-        bitWrite(data, CONTROLLER_PLAYER_BIT_RIGHT + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_UP + bitshift, 0);
+        bitWrite(data, CONTROLLER_BIT_RIGHT + bitshift, 1);
       }
       else if (_player_light_twirl_state[player] == 2)
       {
-        bitWrite(data, CONTROLLER_PLAYER_BIT_RIGHT + bitshift, 0);
-        bitWrite(data, CONTROLLER_PLAYER_BIT_DOWN + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_RIGHT + bitshift, 0);
+        bitWrite(data, CONTROLLER_BIT_DOWN + bitshift, 1);
       }
       else if (_player_light_twirl_state[player] == 3)
       {
-        bitWrite(data, CONTROLLER_PLAYER_BIT_DOWN + bitshift, 0);
-        bitWrite(data, CONTROLLER_PLAYER_BIT_LEFT + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_DOWN + bitshift, 0);
+        bitWrite(data, CONTROLLER_BIT_LEFT + bitshift, 1);
       }
     
       if (++_player_light_twirl_state[player] > 3)
@@ -258,40 +258,40 @@ void Controller::update_lights()
     {
       if (_player_light_twirl_state[player] == 0)
       {
-        bitWrite(data, CONTROLLER_PLAYER_BIT_UP + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_UP + bitshift, 1);
       }
       else if (_player_light_twirl_state[player] == 1)
       {
-        bitWrite(data, CONTROLLER_PLAYER_BIT_UP + bitshift, 1);
-        bitWrite(data, CONTROLLER_PLAYER_BIT_RIGHT + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_UP + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_RIGHT + bitshift, 1);
       }
       else if (_player_light_twirl_state[player] == 2)
       {
-        bitWrite(data, CONTROLLER_PLAYER_BIT_UP + bitshift, 1);
-        bitWrite(data, CONTROLLER_PLAYER_BIT_RIGHT + bitshift, 1);
-        bitWrite(data, CONTROLLER_PLAYER_BIT_DOWN + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_UP + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_RIGHT + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_DOWN + bitshift, 1);
       }
       else if (_player_light_twirl_state[player] == 3)
       {
-        bitWrite(data, CONTROLLER_PLAYER_BIT_UP + bitshift, 1);
-        bitWrite(data, CONTROLLER_PLAYER_BIT_RIGHT + bitshift, 1);
-        bitWrite(data, CONTROLLER_PLAYER_BIT_DOWN + bitshift, 1);
-        bitWrite(data, CONTROLLER_PLAYER_BIT_LEFT + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_UP + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_RIGHT + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_DOWN + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_LEFT + bitshift, 1);
       }
       else if (_player_light_twirl_state[player] == 4)
       {
-        bitWrite(data, CONTROLLER_PLAYER_BIT_RIGHT + bitshift, 1);
-        bitWrite(data, CONTROLLER_PLAYER_BIT_DOWN + bitshift, 1);
-        bitWrite(data, CONTROLLER_PLAYER_BIT_LEFT + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_RIGHT + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_DOWN + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_LEFT + bitshift, 1);
       }
       else if (_player_light_twirl_state[player] == 5)
       {
-        bitWrite(data, CONTROLLER_PLAYER_BIT_DOWN + bitshift, 1);
-        bitWrite(data, CONTROLLER_PLAYER_BIT_LEFT + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_DOWN + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_LEFT + bitshift, 1);
       }
       else if (_player_light_twirl_state[player] == 6)
       {
-        bitWrite(data, CONTROLLER_PLAYER_BIT_LEFT + bitshift, 1);
+        bitWrite(data, CONTROLLER_BIT_LEFT + bitshift, 1);
       }
       
       if (++_player_light_twirl_state[player] > 7)
@@ -303,10 +303,10 @@ void Controller::update_lights()
     // Handle OFF state.
     if (_player_light_state[player] == CONTROLLER_LIGHT_STATE_OFF)
     {
-      bitWrite(data, CONTROLLER_PLAYER_BIT_UP + bitshift, 0);
-      bitWrite(data, CONTROLLER_PLAYER_BIT_DOWN + bitshift, 0);
-      bitWrite(data, CONTROLLER_PLAYER_BIT_LEFT + bitshift, 0);
-      bitWrite(data, CONTROLLER_PLAYER_BIT_RIGHT + bitshift, 0);
+      bitWrite(data, CONTROLLER_BIT_UP + bitshift, 0);
+      bitWrite(data, CONTROLLER_BIT_DOWN + bitshift, 0);
+      bitWrite(data, CONTROLLER_BIT_LEFT + bitshift, 0);
+      bitWrite(data, CONTROLLER_BIT_RIGHT + bitshift, 0);
     }
   }
 
