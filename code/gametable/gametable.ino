@@ -14,8 +14,8 @@ Menu        menu;
 
 // TODO: 
 //       - Tetris:  Death screen: remove all lines one by one from the top
-//       - Menu:    Player selection after boot
 //       - Tetris:  Change Tetris to play against framebuffer (save memory) NOT POSSIBLE...
+//       - Menu:    Player selection after boot
 //       - General: Rotate screen if player 2 is playing
 //       - General: Save RAM by moving data into single bytes?
 //       - General: add more comments?

@@ -4,7 +4,6 @@
 #include "Arduino.h"
 #include "display.h"
 #include "controller.h"
-#include "point.h"
 #include "countdown.h"
 #include "menu.h"
 
@@ -56,7 +55,7 @@ class TetrisGame
     Countdown*  _countdown;
     Menu*       _menu;
 
-    uint8_t _field[20][12];       // Playing field pixels (TODO: Remove the need for this)
+    uint8_t _field[DISPLAY_MATRIX_H][DISPLAY_MATRIX_W]; // Playing fields
     
     uint8_t       _game_state;
     unsigned long _game_last_fall_update;
@@ -73,7 +72,7 @@ class TetrisGame
     uint8_t _current_piece;
     int8_t  _last_pieces[2] = { -1, -1 };
     uint8_t _current_rotation;
-    Point   _current_location;
+    uint8_t _current_location[2];
 
     uint8_t       _removeline_state;
     unsigned long _removeline_last_update;

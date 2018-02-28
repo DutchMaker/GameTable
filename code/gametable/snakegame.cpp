@@ -153,7 +153,7 @@ void SnakeGame::spawn_food()
 
   uint8_t fix_food_y = DISPLAY_MATRIX_H - _food_y - 1;
 
-  if (_display->get_pixel(_food_x, fix_food_y) != 0)
+  if (!_display->get_pixel(_food_x, fix_food_y))
   {
     // If another pixel is already present at this location, cancel and spawn again.
     spawn_food();

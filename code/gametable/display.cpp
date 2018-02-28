@@ -46,7 +46,7 @@ void Display::clear_pixel(uint8_t x, uint8_t y)
 }
 
 // Get the value of the pixel at specified location.
-uint8_t Display::get_pixel(uint8_t x, uint8_t y)
+CRGB Display::get_pixel(uint8_t x, uint8_t y)
 {
   return _framebuffer[coords_to_index(x, y)];
 }

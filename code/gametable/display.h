@@ -17,13 +17,13 @@
 class Display
 {
   public:
-    void    setup();
-    void    update();
-    void    set_pixel(uint8_t x, uint8_t y, CRGB color);
-    void    set_pixel(uint8_t x, uint8_t y, uint8_t palette_color);
-    void    clear_pixel(uint8_t x, uint8_t y);
-    uint8_t get_pixel(uint8_t x, uint8_t y);
-    void    clear_pixels();
+    void setup();
+    void update();
+    void set_pixel(uint8_t x, uint8_t y, CRGB color);
+    void set_pixel(uint8_t x, uint8_t y, uint8_t palette_color);
+    void clear_pixel(uint8_t x, uint8_t y);
+    CRGB get_pixel(uint8_t x, uint8_t y);
+    void clear_pixels();
     
   private:
     uint16_t coords_to_index(uint8_t x, uint8_t y);

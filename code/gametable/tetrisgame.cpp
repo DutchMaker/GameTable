@@ -297,8 +297,8 @@ bool TetrisGame::check_collision()
     uint8_t x = TETRIS_DATA_TETROMINO(_current_piece, _current_rotation, i, 0);
     uint8_t y = TETRIS_DATA_TETROMINO(_current_piece, _current_rotation, i, 1);
 
-    int8_t index_x = x + _current_location.x;
-    int8_t index_y = y + _current_location.y;
+    int8_t index_x = x + _current_location[0];
+    int8_t index_y = y + _current_location[1];
 
     if (index_x < 0 || index_x > 11)
     {
@@ -334,8 +334,8 @@ void TetrisGame::draw_piece(bool field_buffer)
     uint8_t x = TETRIS_DATA_TETROMINO(_current_piece, _current_rotation, i, 0);
     uint8_t y = TETRIS_DATA_TETROMINO(_current_piece, _current_rotation, i, 1);
 
-    uint8_t index_x = x + _current_location.x;
-    uint8_t index_y = y + _current_location.y;
+    uint8_t index_x = x + _current_location[0];
+    uint8_t index_y = y + _current_location[1];
 
     if (index_x > 11)
     {
@@ -361,8 +361,8 @@ void TetrisGame::draw_piece(bool field_buffer)
 // Create a new player controlled piece in the top of the screen.
 void TetrisGame::create_new_piece()
 {
-    _current_location.x = 5;
-    _current_location.y = -1;
+    _current_location[0] = 5;
+    _current_location[1] = -1;
     _current_rotation = 0;
 
     // Select a random tetris piece and prevent the same piece from being repeates more than twice.
@@ -427,12 +427,12 @@ void TetrisGame::handle_input()
 
   if (button == CONTROLLER_BIT_RIGHT)
   {
-    uint8_t previous_x = _current_location.x;
-    _current_location.x++;
+    uint8_t previous_x = _current_location[0];
+    _current_location[0]++;
 
     if (check_collision())
     {
-      _current_location.x = previous_x;
+      _current_location[0] = previous_x;
     }
 
     _controller->reset_queues();
@@ -452,12 +452,12 @@ void TetrisGame::handle_input()
 
   if (button == CONTROLLER_BIT_LEFT)
   {
-    uint8_t previous_x = _current_location.x;
-    _current_location.x--;
+    uint8_t previous_x = _current_location[0];
+    _current_location[0]--;
 
     if (check_collision())
     {
-      _current_location.x = previous_x;
+      _current_location[0] = previous_x;
     }
 
     _controller->reset_queues();
@@ -469,12 +469,12 @@ void TetrisGame::handle_input()
 // Moves the piece down. Returns true if piece was placed (reached bottom).
 bool TetrisGame::move_down()
 {
-  uint8_t previous_y = _current_location.y;
-  _current_location.y++;
+  uint8_t previous_y = _current_location[1];
+  _current_location[1]++;
 
   if (check_collision())
   {
-    _current_location.y = previous_y;
+    _current_location[1] = previous_y;
 
     // Draw the piece to the field buffer
     draw_piece(true);
@@ -491,7 +491,7 @@ bool TetrisGame::move_down()
 
     // If we have collision on move_down and the piece is still at the top;
     // we reached the end of the game.
-    if (_current_location.y == 0 || _current_location.y == 1)
+    if (_current_location[1] == 0 || _current_location[1] == 1)
     {
       _game_state = TETRIS_GAMESTATE_DEAD;
       _dead_since = millis();
