@@ -1,6 +1,6 @@
 #include "point.h"
 
-Point get_point(byte x, byte y)
+Point get_point(int8_t x, int8_t y)
 {
   return { x, y };
 }

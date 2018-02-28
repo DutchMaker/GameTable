@@ -62,28 +62,28 @@ Point tetromino[7][4][4] =
 void TetrisGame::start(Display* display, Controller* controller, Menu* menu)
 {
   _display = display;
-  _menu = menu;
-  
+  _menu = menu;  
   _controller = controller;
-  //_controller->update_speed = TETRIS_GAME_SPEED;
   
   restart();
 }
 
 void TetrisGame::start_game()
 {
-  _current_location = get_point(5, -1);
-  _current_rotation = 0;
-  _current_piece = (byte)random(0, 7);
+  _last_pieces[0] = -1;
+  _last_pieces[1] = -1;
+
+  _last_displayed_score = -1;
+  _score = 0;
+
+  create_new_piece();
 }
 
 void TetrisGame::restart()
 {
-  _current_location = get_point(5, -1);
-  _current_rotation = 0;
-  _current_piece = (byte)random(0, 7);
-
   clear_field();
+  
+  start_game();
 
   _countdown_state = -1;
   _game_state = TETRIS_GAMESTATE_COUNTDOWN;
@@ -136,6 +136,8 @@ void TetrisGame::update_game()
       draw_field();
     }
     
+    draw_score();
+
     _game_last_update = millis();
   }
 }
@@ -242,6 +244,7 @@ void TetrisGame::update_removelines()
   {
     // Remove lines
     uint8_t row = 20;
+    uint8_t removed_rows = 0;
 
     while (row > 0)
     {
@@ -256,6 +259,9 @@ void TetrisGame::update_removelines()
           {
             set_field_pixel(col, row, 0);
           }
+
+          // Count score
+          _score += (++removed_rows) * TETRIS_SCORE_PER_LINE;
 
           break;
         }
@@ -280,12 +286,7 @@ void TetrisGame::update_removelines()
     _game_state = TETRIS_GAMESTATE_RUNNING;
     _controller->reset_queues();
 
-    // Create a new piece
-    _current_location.x = 5;
-    _current_location.y = -1;
-
-    _current_piece = (byte)random(0, 7);
-    _current_rotation = 0;
+    create_new_piece();
   }
 
   _removeline_last_update = millis();
@@ -377,6 +378,21 @@ void TetrisGame::draw_piece(bool field_buffer)
   }
 }
 
+// Create a new player controlled piece in the top of the screen.
+void TetrisGame::create_new_piece()
+{
+    _current_location.x = 5;
+    _current_location.y = -1;
+    _current_rotation = 0;
+
+    // Select a random tetris piece and prevent the same piece from being repeates more than twice.
+    do
+    {
+      _current_piece = (uint8_t)random(0, 7);
+    }
+    while (_last_pieces[0] == _current_piece && _last_pieces[1] == _current_piece);
+}
+
 void TetrisGame::draw_field()
 {
   for (uint8_t row = 0; row < 20; row++)
@@ -386,6 +402,15 @@ void TetrisGame::draw_field()
       uint8_t fix_row = DISPLAY_MATRIX_H - row - 1;
       _display->set_pixel(col, fix_row, _field[row][col]);
     }
+  }
+}
+
+void TetrisGame::draw_score()
+{
+  if (_score != _last_displayed_score)
+  {
+    Serial.println(_score);
+    _last_displayed_score = _score;
   }
 }
 
@@ -413,8 +438,6 @@ void TetrisGame::handle_input()
       _current_rotation = previous_rotation;
     }
 
-    //_controller->reset_queues();
-    
     return;
   }
 
@@ -428,7 +451,7 @@ void TetrisGame::handle_input()
       _current_location.x = previous_x;
     }
 
-    //_controller->reset_queues();
+    _controller->reset_queues();
     
     return;
   }
@@ -436,7 +459,6 @@ void TetrisGame::handle_input()
   if (button == CONTROLLER_BIT_DOWN)
   {
     _game_last_update -= TETRIS_GAME_SPEED;
-    //_controller->reset_queues();
 
     return;
   }
@@ -451,7 +473,7 @@ void TetrisGame::handle_input()
       _current_location.x = previous_x;
     }
 
-    //_controller->reset_queues();
+    _controller->reset_queues();
     
     return;
   }
@@ -471,11 +493,12 @@ bool TetrisGame::move_down()
     draw_piece(true);
     _display->clear_pixels();
 
-    // Remove lines
+    // Remove lines that are complete.
     if (lines_completed())
     {
       _game_state = TETRIS_GAMESTATE_REMOVELINES;
       _removeline_state = 0;
+
       return true;
     }
 
@@ -488,12 +511,7 @@ bool TetrisGame::move_down()
       return true;
     }
 
-    // Create a new piece
-    _current_location.x = 5;
-    _current_location.y = -1;
-
-    _current_piece = (uint8_t)random(0, 7);
-    _current_rotation = 0;
+    create_new_piece();
 
     return true;
   }
@@ -510,7 +528,7 @@ bool TetrisGame::lines_completed()
       return true;
     }
   }
-
+  
   return false;
 }
 
@@ -532,7 +550,7 @@ bool TetrisGame::is_completed_line(uint8_t row)
 
 void TetrisGame::change_line_color(uint8_t row, uint8_t color)
 {
-  for (byte col = 0; col < 12; col++)
+  for (uint8_t col = 0; col < 12; col++)
   {
     set_field_pixel(col, row, color);
   }

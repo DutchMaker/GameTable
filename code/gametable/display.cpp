@@ -1,7 +1,5 @@
 #include "display.h"
 
-//CRGB* const leds(DISPLAY_NUM_LEDS);
-
 // Initialize the display.
 void Display::setup()
 {
@@ -19,22 +17,26 @@ void Display::update()
     return;
   }
 
-  // TODO: Check if framebuffer changed since last update
-
-  FastLED.show();
+  if (_framebuffer_updated)
+  {
+    FastLED.show();
+    _framebuffer_updated = false;
+  }
 
   _last_update = millis();
 }
 
-// Set the value of the pixel at specified location.
+// Set the color value of the pixel at specified location.
 void Display::set_pixel(uint8_t x, uint8_t y, CRGB color)
 {
   _framebuffer[coords_to_index(x, y)] = color;
+  _framebuffer_updated = true;
 }
 
-void Display::set_pixel(uint8_t x, uint8_t y, uint8_t color)
+// Set the color value of the pixel at specified location.
+void Display::set_pixel(uint8_t x, uint8_t y, uint8_t palette_color)
 {
-  set_pixel(x, y, _palette[color]);
+  set_pixel(x, y, _palette[palette_color]);
 }
 
 // Clear the value of the pixel at specified location.

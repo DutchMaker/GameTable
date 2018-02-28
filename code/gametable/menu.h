@@ -6,7 +6,8 @@
 #include "controller.h"
 #include "point.h"
 
-#define MENU_UPDATE_SPEED 300
+#define MENU_NUM_GAMES 3
+#define MENU_UPDATE_SPEED 150
 
 class Menu
 {
@@ -15,14 +16,14 @@ class Menu
     void show_menu();
     void update();
 
-    int8_t selected_game;
-    bool run_game;
+    int8_t  selected_game;
+    bool    run_game;
 
   private:
     void draw_options();
     void handle_input();
 
-    Display* _display;                        // Pointer to Display object.
+    Display*    _display;
     Controller* _controller;
 
     bool _visible_state;

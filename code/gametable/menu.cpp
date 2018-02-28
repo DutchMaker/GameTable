@@ -1,22 +1,23 @@
 #include "menu.h"
 
-uint8_t options_data[2][4][3] =
+uint8_t options_data[3][7][3] =
 {
-  { { 2, 7, 1 }, { 2, 8, 7 }, { 2, 9, 7 }, { 2, 10, 7 } },
-  { { 7, 7, 5 }, { 7, 8, 5 }, { 6, 8, 5 }, { 6, 9, 5 } }
+  { { 4, 15, 3 }, { 6, 15, 9 }, { 7, 15, 4 }, { 9, 15, 4 }, { 9, 15, 4 } },
+  { { 5, 9, 5 }, { 6, 9, 5 }, { 7, 9, 5 }, { 6, 10, 5 } },
+  { { 3, 2, 1 }, { 3, 3, 1 }, { 3, 4, 1 }, { 5, 3, 3 }, { 8, 2, 1 }, { 8, 3, 1 }, { 8, 3, 1 } }
 };
 
 void Menu::start(Display* display, Controller* controller)
 {
   _display = display;
-
   _controller = controller;
-  //_controller->update_speed = MENU_UPDATE_SPEED + 100;
-
+  
   selected_game = 0;
   run_game = false;
 
   _visible_state = true;
+  
+  randomSeed(analogRead(0));
 }
 
 void Menu::show_menu()
@@ -42,7 +43,7 @@ void Menu::update()
 
 void Menu::draw_options()
 {
-  for (byte game = 0; game < 2; game++)
+  for (byte game = 0; game < MENU_NUM_GAMES; game++)
   {
     for (byte i = 0; i < 4; i++)
     {
@@ -80,42 +81,41 @@ void Menu::handle_input()
     return;
   }
 
-  if (button == CONTROLLER_BIT_UP)
+  if (button == CONTROLLER_BIT_RIGHT) 
   {
+    // Start selected game
     run_game = true;
     randomSeed(millis());
-
-    _controller->reset_queues();
 
     return;
   }
 
-  if (button == CONTROLLER_BIT_RIGHT)
+  if (button == CONTROLLER_BIT_DOWN)  
   {
+    // Select previous game
     selected_game++;
 
-    if (selected_game > 1)
+    if (selected_game > MENU_NUM_GAMES - 1)
     {
       selected_game = 0;
     }
 
     randomSeed(millis());
-    _controller->reset_queues();
 
     return;
   }
 
-  if (button == CONTROLLER_BIT_LEFT)
+  if (button == CONTROLLER_BIT_UP)  
   {
+    // Select next game
     selected_game--;
 
     if (selected_game < 0)
     {
-      selected_game = 1;
+      selected_game = MENU_NUM_GAMES - 1;
     }
 
     randomSeed(millis());
-    _controller->reset_queues();
 
     return;
   }

@@ -13,6 +13,8 @@
 #define TETRIS_GAMESTATE_DEAD 3
 #define TETRIS_GAMESTATE_REMOVELINES 4
 
+#define TETRIS_SCORE_PER_LINE 100
+
 #define TETRIS_GAME_SPEED 400  // millis per update, lower = faster.
 #define TETRIS_MOVE_SPEED 100
 
@@ -25,12 +27,17 @@ class TetrisGame
   private:
     void restart();
     void start_game();
+
     void update_game();
     void update_countdown();
     void update_dead();
     void update_removelines();
+
     void draw_piece(bool field_buffer);
     void draw_field();
+    void draw_score();
+    void create_new_piece();
+
     void handle_input();
 
     void clear_field();
@@ -42,31 +49,32 @@ class TetrisGame
     bool is_completed_line(uint8_t row);
     void change_line_color(uint8_t row, uint8_t color);
 
-    Display*    _display;                        // Pointer to Display object.
+    Display*    _display;
     Controller* _controller;
     Menu*       _menu;
 
-    uint8_t _field[20][12];  // Playing field pixels
-
-    uint8_t _game_state;
+    uint8_t _field[20][12];       // Playing field pixels (TODO: Remove the need for this)
+    
+    uint8_t       _game_state;
     unsigned long _game_last_update;
     unsigned long _game_last_move_update;
     
     unsigned long _score;
-    unsigned long _score_last_update;
-        
-    uint8_t _countdown_state;
-    unsigned long _countdown_last_update;     // Last time countdown state update was performed.
+    unsigned long _last_displayed_score;
+    
+    uint8_t       _countdown_state;       // TODO: MOVE COUNTDOWN TO OWN CLASS
+    unsigned long _countdown_last_update; // Last time countdown state update was performed.
 
-    boolean _dead_update_state;
+    bool          _dead_update_state;
     unsigned long _dead_last_update;
     unsigned long _dead_since;
 
     uint8_t _current_piece;
+    int8_t  _last_pieces[2] = { -1, -1 };
     uint8_t _current_rotation;
-    Point _current_location;
+    Point   _current_location;
 
-    uint8_t _removeline_state;
+    uint8_t       _removeline_state;
     unsigned long _removeline_last_update;
 };
 
