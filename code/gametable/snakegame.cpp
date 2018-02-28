@@ -1,10 +1,11 @@
 #include "snakegame.h"
 
 // Start snake game.
-void SnakeGame::start(Display* display, Controller* controller, Menu* menu)
+void SnakeGame::start(Display* display, Controller* controller, Countdown* countdown, Menu* menu)
 {
   _display = display;
   _controller = controller;
+  _countdown = countdown;
   _menu = menu;
 
   restart();
@@ -12,18 +13,21 @@ void SnakeGame::start(Display* display, Controller* controller, Menu* menu)
 
 void SnakeGame::restart()
 {
-  _countdown_state = -1;
+  _countdown->reset();
+
   _game_state = SNAKE_GAMESTATE_COUNTDOWN;
   _snake_direction = SNAKE_DIR_RIGHT;
 
   _display->clear_pixels();
 
-  _controller->reset_queue();
+  _controller->reset_queues();
 }
 
 void SnakeGame::start_game()
 {
   _score = 0;
+
+  _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_ON);
   
   // Reset snake
   for (int i = 0; i < 200; i++)
@@ -70,7 +74,7 @@ void SnakeGame::update()
 // Update logic for running state.
 void SnakeGame::update_game()
 {
-  if (millis() - _game_last_update > SNAKE_GAME_SPEED)
+  if (millis() - _game_last_update > SNAKE_UPDATESPEED_GAME)
   {
     update_direction();
     move_snake();
@@ -91,43 +95,16 @@ void SnakeGame::update_game()
   }
 }
 
-// Update logic for countdown state.
+// Update logic for countdown at start of game.
 void SnakeGame::update_countdown()
 {
-  if (millis() - _countdown_last_update < 1000)
-  {
-    return;
-  }
+  _countdown->update();
 
-  if (++_countdown_state > 2)
+  if (_countdown->finished)
   {
     _game_state = SNAKE_GAMESTATE_RUNNING;
     start_game();
-    
-    return;
   }
-
-  // Draw countdown digit...
-  byte offset_y = 5;
-
-  _display->clear_pixels();
-
-  for (byte y = 0; y < 7; y++)
-  {
-    for (byte x = 0; x < 5; x++)
-    {
-      if (countdown_data[_countdown_state][y][x] != 0)
-      {
-        if (x + 1 + (_countdown_state * 2) < 10)
-        {
-          _display->set_pixel(x + 1 + (_countdown_state * 2), y + offset_y, 7);
-        }
-      }
-    }
-  }
-
-  _display->update();
-  _countdown_last_update = millis();
 }
 
 // Update logic for dead game state.
@@ -150,13 +127,13 @@ void SnakeGame::update_dead()
 
   if (millis() - _dead_since > 1000)
   {
-    if (_controller->get_button_from_queue() == CONTROLLER_BIT_UP)
+    if (_controller->take_button_from_queue(CONTROLLER_PLAYER1) == CONTROLLER_BIT_UP)
     {
       restart();
       start_game();
 
       _menu->show_menu();
-      _controller->reset_queue();
+      _controller->reset_queues();
 
       return;
     }
@@ -171,16 +148,18 @@ void SnakeGame::update_dead()
 // Spawn new food at a random location.
 void SnakeGame::spawn_food()
 {
-  _food_x = (byte)random(0, 9);
+  _food_x = (byte)random(0, 11);
   _food_y = (byte)random(0, 19);
 
-  if (_display->get_pixel(_food_x, _food_y) != 0)
+  uint8_t fix_food_y = DISPLAY_MATRIX_H - _food_y - 1;
+
+  if (_display->get_pixel(_food_x, fix_food_y) != 0)
   {
     // If another pixel is already present at this location, cancel and spawn again.
     spawn_food();
   }
 
-  _display->set_pixel(_food_x, _food_y, SNAKE_COLOR_FOOD);
+  _display->set_pixel(_food_x, fix_food_y, SNAKE_COLOR_FOOD);
 
   _spawn_new_food = false;  // Remember that we don't need to spawn new food for next update.
 }
@@ -188,16 +167,16 @@ void SnakeGame::spawn_food()
 // Move the snake one step.
 void SnakeGame::move_snake()
 {
-  byte prev_x = _snake[_snake_length - 1][0];
-  byte prev_y = _snake[_snake_length - 1][1];
+  uint8_t prev_x = _snake[_snake_length - 1][0];
+  uint8_t prev_y = _snake[_snake_length - 1][1];
   
   for (int i = _snake_length - 1; i >= 0; i--)
   {
     // Move the head.
     if (i == _snake_length - 1)
     {
-      byte new_x = _snake[i][0];
-      byte new_y = _snake[i][1];
+      uint8_t new_x = _snake[i][0];
+      uint8_t new_y = _snake[i][1];
       
       switch (_snake_direction)
       {
@@ -212,7 +191,7 @@ void SnakeGame::move_snake()
           }
           break;
         case SNAKE_DIR_RIGHT:
-          if (_snake[i][0] < 9)
+          if (_snake[i][0] < 11)
           {
             new_x++;
           }
@@ -238,19 +217,22 @@ void SnakeGame::move_snake()
           }
           else
           {
-            new_x = 9;
+            new_x = 11;
           }
           break;
       }
 
       // Check if head touches a body part.
-      for (byte j = 0; j < _snake_length - 1; j++)
+      for (uint8_t j = 0; j < _snake_length - 1; j++)
       {
         if (_snake[j][0] == new_x && _snake[j][1] == new_y)
         {
           _game_state = SNAKE_GAMESTATE_DEAD;
           _dead_update_state = false;
           _dead_since = millis();
+
+          _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_BLINK_UP);
+
           return; 
         }
       }
@@ -276,8 +258,8 @@ void SnakeGame::move_snake()
     else
     {
       // Move body parts
-      byte cur_x = _snake[i][0];
-      byte cur_y = _snake[i][1];
+      uint8_t cur_x = _snake[i][0];
+      uint8_t cur_y = _snake[i][1];
   
       _snake[i][0] = prev_x;
       _snake[i][1] = prev_y;
@@ -287,7 +269,8 @@ void SnakeGame::move_snake()
     }
 
     // Clear pixel at previous body part location.
-    _display->clear_pixel(prev_x, prev_y);
+    uint8_t fix_prev_y = DISPLAY_MATRIX_H - prev_y - 1;
+    _display->clear_pixel(prev_x, fix_prev_y);
   }
 }
 
@@ -296,13 +279,15 @@ void SnakeGame::draw_snake()
 {
   for (int i = 0; i < _snake_length; i++)
   {
+    uint8_t fix_y = DISPLAY_MATRIX_H - _snake[i][1] - 1;
+
     if (i == _snake_length - 1)
     {
-      _display->set_pixel(_snake[i][0], _snake[i][1], SNAKE_COLOR_HEAD);
+      _display->set_pixel(_snake[i][0], fix_y, SNAKE_COLOR_HEAD);
     }
     else
     {
-      _display->set_pixel(_snake[i][0], _snake[i][1], SNAKE_COLOR_BODY);
+      _display->set_pixel(_snake[i][0], fix_y, SNAKE_COLOR_BODY);
     }
   }
 }
@@ -310,12 +295,7 @@ void SnakeGame::draw_snake()
 // Update the direction in which the snake is traveling.
 void SnakeGame::update_direction()
 {
-  byte button = _controller->get_button_from_queue();
-
-  if (button == 0)
-  {
-    return;
-  }
+  int8_t button = _controller->take_button_from_queue(CONTROLLER_PLAYER1);
   
   if (button == CONTROLLER_BIT_UP && _snake_direction != SNAKE_DIR_UP && _snake_direction != SNAKE_DIR_DOWN)
   {
@@ -341,4 +321,3 @@ void SnakeGame::update_direction()
     return;
   }
 }
-

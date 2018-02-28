@@ -7,12 +7,12 @@
 #include <FastLED.h>
 
 #define DISPLAY_PIN_LEDS    9
-#define DISPLAY_BRIGHTNESS  96 // TODO: Test different brightness
+#define DISPLAY_BRIGHTNESS  64
 #define DISPLAY_CHIPSET     WS2811
 #define DISPLAY_MATRIX_W    12
 #define DISPLAY_MATRIX_H    20
 #define DISPLAY_NUM_LEDS    (DISPLAY_MATRIX_W * DISPLAY_MATRIX_H)
-#define DISPLAY_FPS         30
+#define DISPLAY_FPS         20
 
 class Display
 {
@@ -35,19 +35,15 @@ class Display
 
     CRGB _palette[12] = {
       CRGB::Black,      // 0
-      CRGB::WhiteSmoke, // 1  (TODO: maybe replace with gray or silver)
+      CRGB::WhiteSmoke, // 1
       CRGB::Blue,       // 2
       CRGB::Red,        // 3
-      CRGB::Orange,     // 4
-      CRGB::Green,      // 5  (maybe LimeGreen?)
-      CRGB::Sienna,     // 6
-      CRGB::Purple,     // 7
-
-      CRGB::Cyan,       // 8
-      CRGB::Gold,       // 9  (Maybe Yellow?)
-      CRGB::DeepPink,   // 10
-
-      CRGB::DodgerBlue, // 11 (maybe replacement for Blue)
+      CRGB::DarkOrange, // 4
+      CRGB::Green,      // 5
+      CRGB::Purple,     // 6
+      CRGB::Sienna,     // 7
+      CRGB::DodgerBlue, // 8
+      CRGB::Yellow      // 9
     };
 };
 

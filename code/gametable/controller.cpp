@@ -308,6 +308,15 @@ void Controller::update_lights()
       bitWrite(data, CONTROLLER_BIT_LEFT + bitshift, 0);
       bitWrite(data, CONTROLLER_BIT_RIGHT + bitshift, 0);
     }
+
+    // Handle ON state.
+    if (_player_light_state[player] == CONTROLLER_LIGHT_STATE_ON)
+    {
+      bitWrite(data, CONTROLLER_BIT_UP + bitshift, 1);
+      bitWrite(data, CONTROLLER_BIT_DOWN + bitshift, 1);
+      bitWrite(data, CONTROLLER_BIT_LEFT + bitshift, 1);
+      bitWrite(data, CONTROLLER_BIT_RIGHT + bitshift, 1);
+    }
   }
 
   // Shift out the lights data.

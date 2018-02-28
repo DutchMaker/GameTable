@@ -1,68 +1,73 @@
 #include "tetrisgame.h"
 
-Point tetromino[7][4][4] = 
+// Macro for retrieving the tetromino data.
+#define TETRIS_DATA_TETROMINO(type,rotation,pixel,xy) (uint8_t)(pgm_read_byte(&tetris_data_tetromino[type][rotation][pixel][xy]))
+
+// Definitions of tetromino, stored in program memory.
+const PROGMEM uint8_t tetris_data_tetromino[7][4][4][2] = 
 {
   // I-Piece
   {
-    { get_point(0, 1), get_point(1, 1), get_point(2, 1), get_point(3, 1) },
-    { get_point(1, 0), get_point(1, 1), get_point(1, 2), get_point(1, 3) },
-    { get_point(0, 1), get_point(1, 1), get_point(2, 1), get_point(3, 1) },
-    { get_point(1, 0), get_point(1, 1), get_point(1, 2), get_point(1, 3) }
+    { { 0, 1 }, { 1, 1 }, { 2, 1 }, { 3, 1 } },
+    { { 1, 0 }, { 1, 1 }, { 1, 2 }, { 1, 3 } },
+    { { 0, 1 }, { 1, 1 }, { 2, 1 }, { 3, 1 } },
+    { { 1, 0 }, { 1, 1 }, { 1, 2 }, { 1, 3 } }
   },
   
   // J-Piece
   {
-    { get_point(0, 1), get_point(1, 1), get_point(2, 1), get_point(2, 0) },
-    { get_point(1, 0), get_point(1, 1), get_point(1, 2), get_point(2, 2) },
-    { get_point(0, 1), get_point(1, 1), get_point(2, 1), get_point(0, 2) },
-    { get_point(1, 0), get_point(1, 1), get_point(1, 2), get_point(0, 0) }
+    { { 0, 1 }, { 1, 1 }, { 2, 1 }, { 2, 0 } },
+    { { 1, 0 }, { 1, 1 }, { 1, 2 }, { 2, 2 } },
+    { { 0, 1 }, { 1, 1 }, { 2, 1 }, { 0, 2 } },
+    { { 1, 0 }, { 1, 1 }, { 1, 2 }, { 0, 0 } }
   },
 
   // L-Piece
   {
-    { get_point(0, 1), get_point(1, 1), get_point(2, 1), get_point(2, 2) },
-    { get_point(1, 0), get_point(1, 1), get_point(1, 2), get_point(0, 2) },
-    { get_point(0, 1), get_point(1, 1), get_point(2, 1), get_point(0, 0) },
-    { get_point(1, 0), get_point(1, 1), get_point(1, 2), get_point(2, 0) }
+    { { 0, 1 }, { 1, 1 }, { 2, 1 }, { 2, 2 } },
+    { { 1, 0 }, { 1, 1 }, { 1, 2 }, { 0, 2 } },
+    { { 0, 1 }, { 1, 1 }, { 2, 1 }, { 0, 0 } },
+    { { 1, 0 }, { 1, 1 }, { 1, 2 }, { 2, 0 } }
   },
 
   // O-Piece
   {
-    { get_point(0, 0), get_point(0, 1), get_point(1, 0), get_point(1, 1) },
-    { get_point(0, 0), get_point(0, 1), get_point(1, 0), get_point(1, 1) },
-    { get_point(0, 0), get_point(0, 1), get_point(1, 0), get_point(1, 1) },
-    { get_point(0, 0), get_point(0, 1), get_point(1, 0), get_point(1, 1) }
+    { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 1, 1 } },
+    { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 1, 1 } },
+    { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 1, 1 } },
+    { { 0, 0 }, { 0, 1 }, { 1, 0 }, { 1, 1 } }
   },
 
   // S-Piece
   {
-    { get_point(1, 0), get_point(2, 0), get_point(0, 1), get_point(1, 1) },
-    { get_point(0, 0), get_point(0, 1), get_point(1, 1), get_point(1, 2) },
-    { get_point(1, 0), get_point(2, 0), get_point(0, 1), get_point(1, 1) },
-    { get_point(0, 0), get_point(0, 1), get_point(1, 1), get_point(1, 2) }
+    { { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 } },
+    { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 1, 2 } },
+    { { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 } },
+    { { 0, 0 }, { 0, 1 }, { 1, 1 }, { 1, 2 } }
   },
 
   // T-Piece
   {
-    { get_point(1, 0), get_point(0, 1), get_point(1, 1), get_point(2, 1) },
-    { get_point(1, 0), get_point(0, 1), get_point(1, 1), get_point(1, 2) },
-    { get_point(0, 1), get_point(1, 1), get_point(2, 1), get_point(1, 2) },
-    { get_point(1, 0), get_point(1, 1), get_point(2, 1), get_point(1, 2) }
+    { { 1, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } },
+    { { 1, 0 }, { 0, 1 }, { 1, 1 }, { 1, 2 } },
+    { { 0, 1 }, { 1, 1 }, { 2, 1 }, { 1, 2 } },
+    { { 1, 0 }, { 1, 1 }, { 2, 1 }, { 1, 2 } }
   },
 
   // Z-Piece
   {
-    { get_point(0, 0), get_point(1, 0), get_point(1, 1), get_point(2, 1) },
-    { get_point(1, 0), get_point(0, 1), get_point(1, 1), get_point(0, 2) },
-    { get_point(0, 0), get_point(1, 0), get_point(1, 1), get_point(2, 1) },
-    { get_point(1, 0), get_point(0, 1), get_point(1, 1), get_point(0, 2) }
+    { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 2, 1 } },
+    { { 1, 0 }, { 0, 1 }, { 1, 1 }, { 0, 2 } },
+    { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 2, 1 } },
+    { { 1, 0 }, { 0, 1 }, { 1, 1 }, { 0, 2 } }
   }
 };
 
-void TetrisGame::start(Display* display, Controller* controller, Menu* menu)
+void TetrisGame::start(Display* display, Controller* controller, Countdown* countdown, Menu* menu)
 {
   _display = display;
-  _menu = menu;  
+  _menu = menu;
+  _countdown = countdown;
   _controller = controller;
   
   restart();
@@ -76,6 +81,9 @@ void TetrisGame::start_game()
   _last_displayed_score = -1;
   _score = 0;
 
+  _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_ON);
+  _countdown->reset();
+
   create_new_piece();
 }
 
@@ -85,7 +93,6 @@ void TetrisGame::restart()
   
   start_game();
 
-  _countdown_state = -1;
   _game_state = TETRIS_GAMESTATE_COUNTDOWN;
 }
 
@@ -110,7 +117,7 @@ void TetrisGame::update()
 
 void TetrisGame::update_game()
 {
-  if (millis() - _game_last_move_update > TETRIS_MOVE_SPEED)
+  if (millis() - _game_last_move_update > TETRIS_UPDATESPEED_MOVEMENT)
   {
     handle_input();
     
@@ -120,10 +127,14 @@ void TetrisGame::update_game()
     _game_last_move_update = millis();
   }
 
-  if (millis() - _game_last_update > TETRIS_GAME_SPEED)
+  if (_already_moved_down)
   {
-    _display->clear_pixels();
+    // Skip move down (falling) if player already manually moved down.
+    _game_last_fall_update = millis();
+  }
 
+  if (millis() - _game_last_fall_update > TETRIS_UPDATESPEED_FALLING)
+  {
     if (!move_down())
     {
       handle_input();
@@ -135,55 +146,26 @@ void TetrisGame::update_game()
     {
       draw_field();
     }
-    
-    draw_score();
 
-    _game_last_update = millis();
+    draw_score();
+    _game_last_fall_update = millis();
   }
 }
 
 void TetrisGame::update_countdown()
 {
-  if (millis() - _countdown_last_update < 1000)
-  {
-    return;
-  }
+  _countdown->update();
 
-  if (++_countdown_state > 2)
+  if (_countdown->finished)
   {
     _game_state = TETRIS_GAMESTATE_RUNNING;
     start_game();
-
-    return;
   }
-
-  // Draw countdown digit...
-  uint8_t offset_y = 5;
-
-  _display->clear_pixels();
-
-  for (uint8_t y = 0; y < 7; y++)
-  {
-    for (uint8_t x = 0; x < 5; x++)
-    {
-      if (countdown_data[_countdown_state][y][x] != 0)
-      {
-        if (x + 1 + (_countdown_state * 2) < 12)
-        {
-          uint8_t fix_y = DISPLAY_MATRIX_H - (y + offset_y) - 1;
-          _display->set_pixel(x + 1 + (_countdown_state * 2), fix_y, 7);
-        }
-      }
-    }
-  }
-
-  _display->update();
-  _countdown_last_update = millis();
 }
 
 void TetrisGame::update_dead()
 {
-  if (millis() - _dead_last_update < 100)
+  if (millis() - _dead_last_update < TETRIS_UPDATESPEED_DEAD_BLINK)
   {
     return;
   }
@@ -213,8 +195,6 @@ void TetrisGame::update_dead()
   }
 
   _dead_update_state = !_dead_update_state;
-
-  _display->update();
   _dead_last_update = millis();
 }
 
@@ -252,6 +232,9 @@ void TetrisGame::update_removelines()
 
       if (is_completed_line(row))
       {
+        // Count score
+        _score += (++removed_rows) * TETRIS_SCORE_PER_LINE;
+
         if (row == 0)
         {
           // Remove line
@@ -259,9 +242,6 @@ void TetrisGame::update_removelines()
           {
             set_field_pixel(col, row, 0);
           }
-
-          // Count score
-          _score += (++removed_rows) * TETRIS_SCORE_PER_LINE;
 
           break;
         }
@@ -314,8 +294,8 @@ bool TetrisGame::check_collision()
 {
   for (uint8_t i = 0; i < 4; i++)
   {
-    uint8_t x = tetromino[_current_piece][_current_rotation][i].x;
-    uint8_t y = tetromino[_current_piece][_current_rotation][i].y;
+    uint8_t x = TETRIS_DATA_TETROMINO(_current_piece, _current_rotation, i, 0);
+    uint8_t y = TETRIS_DATA_TETROMINO(_current_piece, _current_rotation, i, 1);
 
     int8_t index_x = x + _current_location.x;
     int8_t index_y = y + _current_location.y;
@@ -347,12 +327,12 @@ bool TetrisGame::check_collision()
 void TetrisGame::draw_piece(bool field_buffer)
 {
   // Piece is stored directly in the framebuffer.
-  // Only placed pieces are stored in the _field buffer.
+  // Only placed pieces (no longer controlled by player) are stored in the _field buffer.
 
   for (uint8_t i = 0; i < 4; i++)
   {
-    uint8_t x = tetromino[_current_piece][_current_rotation][i].x;
-    uint8_t y = tetromino[_current_piece][_current_rotation][i].y;
+    uint8_t x = TETRIS_DATA_TETROMINO(_current_piece, _current_rotation, i, 0);
+    uint8_t y = TETRIS_DATA_TETROMINO(_current_piece, _current_rotation, i, 1);
 
     uint8_t index_x = x + _current_location.x;
     uint8_t index_y = y + _current_location.y;
@@ -391,6 +371,9 @@ void TetrisGame::create_new_piece()
       _current_piece = (uint8_t)random(0, 7);
     }
     while (_last_pieces[0] == _current_piece && _last_pieces[1] == _current_piece);
+
+    _last_pieces[1] = _last_pieces[0];
+    _last_pieces[0] = _current_piece;
 }
 
 void TetrisGame::draw_field()
@@ -409,7 +392,7 @@ void TetrisGame::draw_score()
 {
   if (_score != _last_displayed_score)
   {
-    Serial.println(_score);
+    // Serial.println(_score);
     _last_displayed_score = _score;
   }
 }
@@ -417,6 +400,7 @@ void TetrisGame::draw_score()
 void TetrisGame::handle_input()
 {
   int8_t button = _controller->take_button_from_queue(CONTROLLER_PLAYER1);
+  _already_moved_down = false;
 
   if (button == -1)
   {
@@ -458,7 +442,10 @@ void TetrisGame::handle_input()
 
   if (button == CONTROLLER_BIT_DOWN)
   {
-    _game_last_update -= TETRIS_GAME_SPEED;
+    _already_moved_down = true;
+    move_down();
+
+    _controller->reset_queues();
 
     return;
   }
@@ -502,12 +489,16 @@ bool TetrisGame::move_down()
       return true;
     }
 
-    // If we have collision on move_down and the piece is still at the top,
+    // If we have collision on move_down and the piece is still at the top;
     // we reached the end of the game.
     if (_current_location.y == 0 || _current_location.y == 1)
     {
       _game_state = TETRIS_GAMESTATE_DEAD;
       _dead_since = millis();
+
+      _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_BLINK_UP);
+      _controller->reset_queues();
+
       return true;
     }
 

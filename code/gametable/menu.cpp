@@ -1,10 +1,14 @@
 #include "menu.h"
 
-uint8_t options_data[3][7][3] =
+// Macro for retrieving menu options data from program memory.
+#define MENU_DATA_OPTIONS(option,pixel,xyc) (uint8_t)(pgm_read_byte(&menu_data_options[option][pixel][xyc]))
+
+// Store static menu options data in program memory.
+const PROGMEM uint8_t menu_data_options[3][7][3] =
 {
-  { { 4, 15, 3 }, { 6, 15, 9 }, { 7, 15, 4 }, { 9, 15, 4 }, { 9, 15, 4 } },
-  { { 5, 9, 5 }, { 6, 9, 5 }, { 7, 9, 5 }, { 6, 10, 5 } },
-  { { 3, 2, 1 }, { 3, 3, 1 }, { 3, 4, 1 }, { 5, 3, 3 }, { 8, 2, 1 }, { 8, 3, 1 }, { 8, 3, 1 } }
+  { { 3, 15, 3 }, { 5, 15, 9 }, { 6, 15, 4 }, { 7, 15, 4 }, { 8, 15, 4 }, { 0, 0, 0 }, { 0, 0, 0 } },
+  { { 5, 9, 5 },  { 6, 9, 5 },  { 7, 9, 5 },  { 6, 10, 5 }, { 0, 0, 0 },  { 0, 0, 0 }, { 0, 0, 0 } },
+  { { 3, 2, 1 },  { 3, 3, 1 },  { 3, 4, 1 },  { 5, 3, 3 },  { 8, 2, 1 },  { 8, 3, 1 }, { 8, 4, 1 } }
 };
 
 void Menu::start(Display* display, Controller* controller)
@@ -15,6 +19,7 @@ void Menu::start(Display* display, Controller* controller)
   selected_game = 0;
   run_game = false;
 
+  _button_state = 0;
   _visible_state = true;
   
   randomSeed(analogRead(0));
@@ -43,13 +48,18 @@ void Menu::update()
 
 void Menu::draw_options()
 {
-  for (byte game = 0; game < MENU_NUM_GAMES; game++)
+  for (uint8_t game = 0; game < MENU_NUM_GAMES; game++)
   {
-    for (byte i = 0; i < 4; i++)
+    for (uint8_t i = 0; i < 7; i++)
     {
-      byte x = options_data[game][i][0];
-      byte y = options_data[game][i][1];
-      byte c = options_data[game][i][2];
+      uint8_t x = MENU_DATA_OPTIONS(game, i, 0);
+      uint8_t y = MENU_DATA_OPTIONS(game, i, 1);
+      uint8_t c = MENU_DATA_OPTIONS(game, i, 2);
+
+      if (x == 0 && y == 0 && c == 0)
+      {
+        continue;
+      }
 
       if (game == selected_game)
       {
@@ -69,20 +79,36 @@ void Menu::draw_options()
     }
   }
 
+  switch (_button_state++)
+  {
+    case 0:
+      _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_BLINK_UP);
+      break;
+    case 1:
+      _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_BLINK_DOWN);
+      break;
+    case 2:
+      // Hardware bug: Player 1 blink right will actually blink the left button.
+      _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_BLINK_LEFT);
+      break;
+  }
+
+  if (_button_state > 2)
+  {
+    _button_state = 0;
+  }
+
   _visible_state = !_visible_state;
 }
 
 void Menu::handle_input()
 {
-  byte button = _controller->take_button_from_queue(CONTROLLER_PLAYER1);
-
-  if (button == 0)
-  {
-    return;
-  }
+  int8_t button = _controller->take_button_from_queue(CONTROLLER_PLAYER1);
 
   if (button == CONTROLLER_BIT_RIGHT) 
   {
+    _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_OFF);
+
     // Start selected game
     run_game = true;
     randomSeed(millis());

@@ -26,7 +26,8 @@ class Menu
     Display*    _display;
     Controller* _controller;
 
-    bool _visible_state;
+    bool          _visible_state;
+    uint8_t       _button_state;
     unsigned long _last_update;
 };
 

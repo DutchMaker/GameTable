@@ -56,8 +56,10 @@ void Display::clear_pixels()
 {
   for (uint16_t i = 0; i < DISPLAY_NUM_LEDS; i++)
   {
-    _framebuffer[i] = 0;
+    _framebuffer[i] = CRGB::Black;
   }
+
+  _framebuffer_updated = true;
 }
 
 // Convert coordinates to framebuffer index.

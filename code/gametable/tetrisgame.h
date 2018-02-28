@@ -5,23 +5,25 @@
 #include "display.h"
 #include "controller.h"
 #include "point.h"
-#include "countdown_data.h"
+#include "countdown.h"
 #include "menu.h"
 
-#define TETRIS_GAMESTATE_COUNTDOWN 1
-#define TETRIS_GAMESTATE_RUNNING 2
-#define TETRIS_GAMESTATE_DEAD 3
-#define TETRIS_GAMESTATE_REMOVELINES 4
+#define TETRIS_GAMESTATE_COUNTDOWN    1
+#define TETRIS_GAMESTATE_RUNNING      2
+#define TETRIS_GAMESTATE_DEAD         3
+#define TETRIS_GAMESTATE_REMOVELINES  4
 
 #define TETRIS_SCORE_PER_LINE 100
 
-#define TETRIS_GAME_SPEED 400  // millis per update, lower = faster.
-#define TETRIS_MOVE_SPEED 100
+//#define TETRIS_UPDATESPEED_GAME     400
+#define TETRIS_UPDATESPEED_MOVEMENT   100
+#define TETRIS_UPDATESPEED_FALLING    400
+#define TETRIS_UPDATESPEED_DEAD_BLINK 200
 
 class TetrisGame
 {
   public:
-    void start(Display* display, Controller* controller, Menu* menu);
+    void start(Display* display, Controller* controller, Countdown* countdown, Menu* menu);
     void update();
     
   private:
@@ -51,19 +53,18 @@ class TetrisGame
 
     Display*    _display;
     Controller* _controller;
+    Countdown*  _countdown;
     Menu*       _menu;
 
     uint8_t _field[20][12];       // Playing field pixels (TODO: Remove the need for this)
     
     uint8_t       _game_state;
-    unsigned long _game_last_update;
+    unsigned long _game_last_fall_update;
     unsigned long _game_last_move_update;
+    bool          _already_moved_down;
     
-    unsigned long _score;
-    unsigned long _last_displayed_score;
-    
-    uint8_t       _countdown_state;       // TODO: MOVE COUNTDOWN TO OWN CLASS
-    unsigned long _countdown_last_update; // Last time countdown state update was performed.
+    long _score;
+    long _last_displayed_score;
 
     bool          _dead_update_state;
     unsigned long _dead_last_update;
