@@ -4,7 +4,6 @@
 #include "Arduino.h"
 #include "display.h"
 #include "controller.h"
-#include "point.h"
 
 #define MENU_NUM_GAMES 3
 #define MENU_UPDATE_SPEED 150

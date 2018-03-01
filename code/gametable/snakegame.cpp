@@ -90,7 +90,7 @@ void SnakeGame::update_game()
 
   if (millis() - _score_last_update >= 1000)
   {
-    _score += 10;
+    // update_score()
     _score_last_update = millis();
   }
 }
