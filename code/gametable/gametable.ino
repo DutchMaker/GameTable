@@ -22,7 +22,6 @@ Menu        menu;
 //       - General: [NEW] Rotate screen if player 2 is playing
 //       - General: [IMP] Save RAM by moving data into single bytes?
 //       - General: [IMP] add more comments?
-//       - Snake:   [BUG] Sometimes more than one food spawns
 
 void setup() 
 {

@@ -148,20 +148,20 @@ void SnakeGame::update_dead()
 // Spawn new food at a random location.
 void SnakeGame::spawn_food()
 {
-  _food_x = (byte)random(0, 11);
-  _food_y = (byte)random(0, 19);
+  _spawn_new_food = false;  // Remember that we don't need to spawn new food for next update.
+
+  _food_x = (uint8_t)random(0, 12);
+  _food_y = (uint8_t)random(0, 20);
 
   uint8_t fix_food_y = DISPLAY_MATRIX_H - _food_y - 1;
 
-  if (!_display->get_pixel(_food_x, fix_food_y))
+  if ((int)_display->get_pixel(_food_x, fix_food_y) != 0)
   {
     // If another pixel is already present at this location, cancel and spawn again.
     spawn_food();
   }
 
   _display->set_pixel(_food_x, fix_food_y, SNAKE_COLOR_FOOD);
-
-  _spawn_new_food = false;  // Remember that we don't need to spawn new food for next update.
 }
 
 // Move the snake one step.
