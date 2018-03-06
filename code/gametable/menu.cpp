@@ -11,24 +11,29 @@ const PROGMEM uint8_t menu_data_options[3][7][3] =
   { { 3, 3, 1 },  { 3, 4, 1 },  { 3, 5, 1 },  { 5, 4, 3 },  { 8, 3, 1 },  { 8, 4, 1 }, { 8, 5, 1 } }
 };
 
-void Menu::start(Display* display, Controller* controller)
+void Menu::start(Display* display, NumericDisplay* numeric_displays, Controller* controller)
 {
-  _display = display;
-  _controller = controller;
-  
-  selected_game = 0;
-  run_game = false;
+  _display          = display;
+  _numeric_displays = numeric_displays;
+  _controller       = controller;
 
-  _button_state = 0;
-  _visible_state = true;
-  
   randomSeed(analogRead(0));
+
+  show_menu();  
 }
 
 void Menu::show_menu()
 {
   selected_game = 0;
   run_game = false;
+
+  _numeric_displays->on();
+  _numeric_displays->write(1, 'E');
+  _numeric_displays->write(2, 'S');
+  _numeric_displays->write(3, 'O');
+  _numeric_displays->write(4, 'O');
+  _numeric_displays->write(5, 'H');
+  _numeric_displays->write(6, 'C');
 
   _visible_state = true;
 }

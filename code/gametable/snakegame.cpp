@@ -1,9 +1,10 @@
 #include "snakegame.h"
 
 // Start snake game.
-void SnakeGame::start(Display* display, Controller* controller, Countdown* countdown, Menu* menu)
+void SnakeGame::start(Display* display, NumericDisplay* numeric_displays, Controller* controller, Countdown* countdown, Menu* menu)
 {
   _display = display;
+  _numeric_displays = numeric_displays;
   _controller = controller;
   _countdown = countdown;
   _menu = menu;
@@ -26,6 +27,9 @@ void SnakeGame::restart()
 void SnakeGame::start_game()
 {
   _score = 0;
+  
+  _numeric_displays->on();
+  _numeric_displays->set_value(_score, CONTROLLER_PLAYER1);
 
   _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_ON);
   
@@ -90,7 +94,7 @@ void SnakeGame::update_game()
 
   if (millis() - _score_last_update >= 1000)
   {
-    // update_score()
+    _numeric_displays->set_value(_score, CONTROLLER_PLAYER1);
     _score_last_update = millis();
   }
 }

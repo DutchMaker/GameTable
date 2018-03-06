@@ -63,9 +63,10 @@ const PROGMEM uint8_t tetris_data_tetromino[7][4][4][2] =
   }
 };
 
-void TetrisGame::start(Display* display, Controller* controller, Countdown* countdown, Menu* menu)
+void TetrisGame::start(Display* display, NumericDisplay* numeric_displays, Controller* controller, Countdown* countdown, Menu* menu)
 {
   _display = display;
+  _numeric_displays = numeric_displays;
   _menu = menu;
   _countdown = countdown;
   _controller = controller;
@@ -80,6 +81,9 @@ void TetrisGame::start_game()
 
   _last_displayed_score = -1;
   _score = 0;
+
+  _numeric_displays->on();
+  _numeric_displays->set_values(0);
 
   _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_ON);
   _countdown->reset();
@@ -392,7 +396,7 @@ void TetrisGame::draw_score()
 {
   if (_score != _last_displayed_score)
   {
-    // Serial.println(_score);
+    _numeric_displays->set_value(_score, CONTROLLER_PLAYER1);
     _last_displayed_score = _score;
   }
 }

@@ -5,14 +5,16 @@
 #include "ponggame.h"
 #include "menu.h"
 #include "countdown.h"
+#include "numericdisplay.h"
 
-Display     display;
-Controller  controller;
-SnakeGame   snake_game;
-TetrisGame  tetris_game;
-PongGame    pong_game;
-Countdown   countdown;
-Menu        menu;
+Display         display;
+NumericDisplay  numeric_displays;
+Controller      controller;
+SnakeGame       snake_game;
+TetrisGame      tetris_game;
+PongGame        pong_game;
+Countdown       countdown;
+Menu            menu;
 
 // TODO: 
 //       - Tetris:  [IMP] Death screen: remove all lines one by one from the top
@@ -26,13 +28,14 @@ Menu        menu;
 void setup() 
 {
   display.setup();
+  numeric_displays.setup();
   controller.setup();
-  countdown.setup(&display);
+  countdown.setup(&display, &numeric_displays);
 
-  snake_game.start(&display, &controller, &countdown, &menu);
-  tetris_game.start(&display, &controller, &countdown, &menu);
+  snake_game.start(&display, &numeric_displays, &controller, &countdown, &menu);
+  tetris_game.start(&display, &numeric_displays, &controller, &countdown, &menu);
   pong_game.start(&display, &controller, &countdown, &menu);
-  menu.start(&display, &controller);
+  menu.start(&display, &numeric_displays, &controller);
 }
 
 void loop() 

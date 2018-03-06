@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "display.h"
+#include "numericdisplay.h"
 #include "controller.h"
 #include "menu.h"
 #include "countdown.h"
@@ -25,7 +26,7 @@
 class SnakeGame
 {
   public:
-    void start(Display* display, Controller* controller, Countdown* countdown, Menu* menu);
+    void start(Display* display, NumericDisplay* numeric_displays, Controller* controller, Countdown* countdown, Menu* menu);
     void update();
     
   private:
@@ -39,11 +40,12 @@ class SnakeGame
     void move_snake();
     void update_direction();
     
-    Display*    _display;
-    Controller* _controller;
-    Countdown*  _countdown;
-    Menu*       _menu;
-
+    Display*        _display;
+    NumericDisplay* _numeric_displays;
+    Controller*     _controller;
+    Countdown*      _countdown;
+    Menu*           _menu;
+    
     uint8_t _game_state;
     
     unsigned long _score;

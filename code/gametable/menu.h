@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "display.h"
+#include "numericdisplay.h"
 #include "controller.h"
 
 #define MENU_NUM_GAMES 3
@@ -11,7 +12,7 @@
 class Menu
 {
   public:
-    void start(Display* display, Controller* controller);
+    void start(Display* display, NumericDisplay* numeric_displays, Controller* controller);
     void show_menu();
     void update();
 
@@ -22,9 +23,10 @@ class Menu
     void draw_options();
     void handle_input();
 
-    Display*    _display;
-    Controller* _controller;
-
+    Display*        _display;
+    NumericDisplay* _numeric_displays;
+    Controller*     _controller;
+    
     bool          _visible_state;
     uint8_t       _button_state;
     unsigned long _last_update;

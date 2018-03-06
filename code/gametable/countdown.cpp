@@ -11,15 +11,19 @@ const PROGMEM uint8_t countdown_data[3][7][5] =
   { { 0, 0, 1, 0, 0 },{ 0, 1, 1, 0, 0 },{ 0, 0, 1, 0, 0 },{ 0, 0, 1, 0, 0 },{ 0, 0, 1, 0, 0 },{ 0, 0, 1, 0, 0 },{ 0, 1, 1, 1, 0 } }
 };
 
-void Countdown::setup(Display* display)
+void Countdown::setup(Display* display, NumericDisplay* numeric_displays)
 {
   _display = display;
+  _numeric_displays = numeric_displays;
+
+  reset();
 }
 
 void Countdown::reset()
 {
   _countdown_state = -1;
   _last_update = 0;
+  _text_displayed = false;
   finished = false;
 }
 
@@ -35,6 +39,18 @@ void Countdown::update()
   {
     finished = true;    
     return;
+  }
+
+  if (!_text_displayed)
+  {
+    _numeric_displays->on();
+    _numeric_displays->write(1, 'Y');
+    _numeric_displays->write(2, 'D');
+    _numeric_displays->write(3, 'A');
+    _numeric_displays->write(4, 'E');
+    _numeric_displays->write(5, 'R');
+
+    _text_displayed = true;
   }
 
   // Draw countdown digit...

@@ -14,7 +14,6 @@
 
 #define TETRIS_SCORE_PER_LINE 100
 
-//#define TETRIS_UPDATESPEED_GAME     400
 #define TETRIS_UPDATESPEED_MOVEMENT   100
 #define TETRIS_UPDATESPEED_FALLING    400
 #define TETRIS_UPDATESPEED_DEAD_BLINK 200
@@ -22,7 +21,7 @@
 class TetrisGame
 {
   public:
-    void start(Display* display, Controller* controller, Countdown* countdown, Menu* menu);
+    void start(Display* display, NumericDisplay* numeric_displays, Controller* controller, Countdown* countdown, Menu* menu);
     void update();
     
   private:
@@ -50,10 +49,11 @@ class TetrisGame
     bool is_completed_line(uint8_t row);
     void change_line_color(uint8_t row, uint8_t color);
 
-    Display*    _display;
-    Controller* _controller;
-    Countdown*  _countdown;
-    Menu*       _menu;
+    Display*        _display;
+    NumericDisplay* _numeric_displays;
+    Controller*     _controller;
+    Countdown*      _countdown;
+    Menu*           _menu;
 
     uint8_t _field[DISPLAY_MATRIX_H][DISPLAY_MATRIX_W]; // Playing fields
     
