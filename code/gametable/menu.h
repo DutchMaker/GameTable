@@ -22,6 +22,7 @@ class Menu
   private:
     void draw_options();
     void handle_input();
+    void set_numeric_display_text();
 
     Display*        _display;
     NumericDisplay* _numeric_displays;

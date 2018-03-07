@@ -1,12 +1,13 @@
 #include "ponggame.h"
 
 // Start Pong game.
-void PongGame::start(Display* display, Controller* controller, Countdown* countdown, Menu* menu)
+void PongGame::start(Display* display, NumericDisplay* numeric_displays, Controller* controller, Countdown* countdown, Menu* menu)
 {
-  _display = display;
-  _controller = controller;
-  _countdown = countdown;
-  _menu = menu;
+  _display          = display;
+  _numeric_displays = numeric_displays;
+  _controller       = controller;
+  _countdown        = countdown;
+  _menu             = menu;
 
   restart();
 }
@@ -24,7 +25,7 @@ void PongGame::restart()
   // Set player 2 paddle X/Y
   _paddle_location[CONTROLLER_PLAYER2][0] = 6;
   _paddle_location[CONTROLLER_PLAYER2][1] = 19;
-
+  
   _display->clear_pixels();
 
   _controller->reset_queues();
@@ -35,9 +36,12 @@ void PongGame::start_game()
   _score[0] = 0;
   _score[1] = 0;
 
-  //_controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_ON);
-  
-  
+  _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_ON);
+  _controller->set_light_state(CONTROLLER_PLAYER2, CONTROLLER_LIGHT_STATE_ON);
+    
+  _numeric_displays->on();
+  _numeric_displays->set_values(0);
+
   _display->clear_pixels();
 
   //draw_snake();

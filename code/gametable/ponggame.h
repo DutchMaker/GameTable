@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "display.h"
+#include "numericdisplay.h"
 #include "controller.h"
 #include "menu.h"
 #include "countdown.h"
@@ -22,7 +23,7 @@
 class PongGame
 {
   public:
-    void start(Display* display, Controller* controller, Countdown* countdown, Menu* menu);
+    void start(Display* display, NumericDisplay* numeric_displays, Controller* controller, Countdown* countdown, Menu* menu);
     void update();
     
   private:
@@ -36,10 +37,11 @@ class PongGame
     void move_ball();
     void draw_game_screen();
     
-    Display*    _display;
-    Controller* _controller;
-    Countdown*  _countdown;
-    Menu*       _menu;
+    Display*        _display;
+    NumericDisplay* _numeric_displays;
+    Controller*     _controller;
+    Countdown*      _countdown;
+    Menu*           _menu;
 
     uint8_t _game_state;    
     uint8_t _paddle_location[2][2];

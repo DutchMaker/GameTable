@@ -82,10 +82,6 @@ void TetrisGame::start_game()
   _last_displayed_score = -1;
   _score = 0;
 
-  _numeric_displays->on();
-  _numeric_displays->set_values(0);
-
-  _controller->set_light_state(_controller->active_player, CONTROLLER_LIGHT_STATE_ON);
   _countdown->reset();
 
   create_new_piece();
@@ -163,6 +159,10 @@ void TetrisGame::update_countdown()
   if (_countdown->finished)
   {
     _game_state = TETRIS_GAMESTATE_RUNNING;
+
+    _controller->set_light_state(_controller->active_player, CONTROLLER_LIGHT_STATE_ON);
+    _numeric_displays->on();
+
     start_game();
   }
 }

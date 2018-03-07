@@ -55,7 +55,7 @@ class NumericDisplay
     void set_values(long value);
     void off();
     void on();
-    void write(uint8_t digit, char character);
+    void write(uint8_t player, uint8_t digit, char character);
 
   private:
     DigitLedDisplay _display_player1 = DigitLedDisplay(NUMERICDISPLAY_PLAYER1_PIN_DIN, NUMERICDISPLAY_PLAYER1_PIN_CS, NUMERICDISPLAY_PLAYER1_PIN_CLK);

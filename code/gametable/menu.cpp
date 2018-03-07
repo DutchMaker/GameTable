@@ -27,13 +27,7 @@ void Menu::show_menu()
   selected_game = 0;
   run_game = false;
 
-  _numeric_displays->on();
-  _numeric_displays->write(1, 'E');
-  _numeric_displays->write(2, 'S');
-  _numeric_displays->write(3, 'O');
-  _numeric_displays->write(4, 'O');
-  _numeric_displays->write(5, 'H');
-  _numeric_displays->write(6, 'C');
+  set_numeric_display_text();
 
   _controller->set_light_state(_controller->active_player, CONTROLLER_LIGHT_STATE_TWIRL_LONG);
 
@@ -117,21 +111,25 @@ void Menu::handle_input()
   int8_t button_player2 = _controller->take_button_from_queue(CONTROLLER_PLAYER2);
 
   // Flip screen orientation
-  if (button_player1 > -1)
+  if (button_player1 > -1 && _controller->active_player == CONTROLLER_PLAYER2)
   {
     _display->set_orientation(true);
     _controller->active_player = CONTROLLER_PLAYER1;
     
     _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_TWIRL_LONG);
     _controller->set_light_state(CONTROLLER_PLAYER2, CONTROLLER_LIGHT_STATE_OFF);
+
+    set_numeric_display_text();
   }
-  else if (button_player2 > -1)
+  else if (button_player2 > -1 && _controller->active_player == CONTROLLER_PLAYER1)
   {
     _display->set_orientation(false);
     _controller->active_player = CONTROLLER_PLAYER2;
 
     _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_OFF);
     _controller->set_light_state(CONTROLLER_PLAYER2, CONTROLLER_LIGHT_STATE_TWIRL_LONG);
+
+    set_numeric_display_text();
   }
 
   if (button_player1 == CONTROLLER_BIT_RIGHT || button_player2 == CONTROLLER_BIT_RIGHT) 
@@ -172,4 +170,15 @@ void Menu::handle_input()
 
     return;
   }
+}
+
+void Menu::set_numeric_display_text()
+{
+  _numeric_displays->on();
+  _numeric_displays->write(_controller->active_player, 1, 'E');
+  _numeric_displays->write(_controller->active_player, 2, 'S');
+  _numeric_displays->write(_controller->active_player, 3, 'O');
+  _numeric_displays->write(_controller->active_player, 4, 'O');
+  _numeric_displays->write(_controller->active_player, 5, 'H');
+  _numeric_displays->write(_controller->active_player, 6, 'C');
 }

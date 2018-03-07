@@ -17,7 +17,7 @@ void NumericDisplay::set_value(long value, uint8_t player)
   }
   else if (player == CONTROLLER_PLAYER2)
   {
-    //_display_player2.printDigit(value);
+    _display_player2.printDigit(value);
   }
 }
 
@@ -30,7 +30,7 @@ void NumericDisplay::set_values(long value)
 void NumericDisplay::off()
 {
   _display_player1.off();
-  //_display_player2.off();
+  _display_player2.off();
 }
 
 void NumericDisplay::on()
@@ -38,11 +38,18 @@ void NumericDisplay::on()
   _display_player1.on();
   _display_player1.clear();
 
-  //_display_player2.on();
-  //_display_player2.clear();
+  _display_player2.on();
+  _display_player2.clear();
 }
 
-void NumericDisplay::write(uint8_t digit, char character)
+void NumericDisplay::write(uint8_t player, uint8_t digit, char character)
 {
-  _display_player1.write(digit, NUMERICDISPLAY_CHARACTER(((uint8_t)character) - 65));
+  if (player == CONTROLLER_PLAYER1)
+  {
+    _display_player1.write(digit, NUMERICDISPLAY_CHARACTER(((uint8_t)character) - 65));
+  }
+  else if (player == CONTROLLER_PLAYER2)
+  {
+    _display_player2.write(digit, NUMERICDISPLAY_CHARACTER(((uint8_t)character) - 65));
+  }
 }
