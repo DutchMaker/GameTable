@@ -85,7 +85,7 @@ void TetrisGame::start_game()
   _numeric_displays->on();
   _numeric_displays->set_values(0);
 
-  _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_ON);
+  _controller->set_light_state(_controller->active_player, CONTROLLER_LIGHT_STATE_ON);
   _countdown->reset();
 
   create_new_piece();
@@ -186,7 +186,7 @@ void TetrisGame::update_dead()
 
   if (millis() - _dead_since > 1000)
   {
-    if (_controller->take_button_from_queue(CONTROLLER_PLAYER1) == CONTROLLER_BIT_UP)
+    if (_controller->take_button_from_queue(_controller->active_player) == CONTROLLER_BIT_UP)
     {
       restart();
       start_game();
@@ -396,14 +396,14 @@ void TetrisGame::draw_score()
 {
   if (_score != _last_displayed_score)
   {
-    _numeric_displays->set_value(_score, CONTROLLER_PLAYER1);
+    _numeric_displays->set_value(_score, _controller->active_player);
     _last_displayed_score = _score;
   }
 }
 
 void TetrisGame::handle_input()
 {
-  int8_t button = _controller->take_button_from_queue(CONTROLLER_PLAYER1);
+  int8_t button = _controller->take_button_from_queue(_controller->active_player);
   _already_moved_down = false;
 
   if (button == -1)
@@ -500,7 +500,7 @@ bool TetrisGame::move_down()
       _game_state = TETRIS_GAMESTATE_DEAD;
       _dead_since = millis();
 
-      _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_BLINK_UP);
+      _controller->set_light_state(_controller->active_player, CONTROLLER_LIGHT_STATE_BLINK_UP);
       _controller->reset_queues();
 
       return true;

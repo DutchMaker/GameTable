@@ -35,7 +35,7 @@ class SnakeGame
     void update_game();
     void update_countdown();
     void update_dead();
-    void draw_snake();
+    void draw_snake_and_food();
     void spawn_food();
     void move_snake();
     void update_direction();

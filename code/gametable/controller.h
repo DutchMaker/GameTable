@@ -45,6 +45,8 @@ class Controller
     void    set_light_state(uint8_t player, uint8_t state);
     int8_t  take_button_from_queue(uint8_t player);
     void    reset_queues();
+
+    uint8_t active_player;
     
   private:
     void    update_lights();

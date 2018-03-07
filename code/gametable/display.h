@@ -6,13 +6,14 @@
 #include "Arduino.h"
 #include <FastLED.h>
 
-#define DISPLAY_PIN_LEDS    9
-#define DISPLAY_BRIGHTNESS  64
-#define DISPLAY_CHIPSET     WS2811
-#define DISPLAY_MATRIX_W    12
-#define DISPLAY_MATRIX_H    20
-#define DISPLAY_NUM_LEDS    (DISPLAY_MATRIX_W * DISPLAY_MATRIX_H)
-#define DISPLAY_FPS         20
+#define DISPLAY_PIN_LEDS      9
+#define DISPLAY_BRIGHTNESS    64
+#define DISPLAY_CHIPSET       WS2811
+#define DISPLAY_MATRIX_W      12
+#define DISPLAY_MATRIX_H      20
+#define DISPLAY_MATRIX_H_HALF (DISPLAY_MATRIX_H / 2)
+#define DISPLAY_NUM_LEDS      (DISPLAY_MATRIX_W * DISPLAY_MATRIX_H)
+#define DISPLAY_FPS           20
 
 class Display
 {
@@ -24,14 +25,17 @@ class Display
     void clear_pixel(uint8_t x, uint8_t y);
     CRGB get_pixel(uint8_t x, uint8_t y);
     void clear_pixels();
+    void set_orientation(bool player1);
     
   private:
-    uint16_t coords_to_index(uint8_t x, uint8_t y);
+    uint16_t  coords_to_index(uint8_t x, uint8_t y);
+    void      flip_framebuffer();
 
     unsigned long _last_update;
     bool _framebuffer_updated;
     
     CRGB _framebuffer[DISPLAY_NUM_LEDS];
+    bool _player1_orientation;
 
     CRGB _palette[12] = {
       CRGB::Black,      // 0

@@ -11,10 +11,11 @@ const PROGMEM uint8_t countdown_data[3][7][5] =
   { { 0, 0, 1, 0, 0 },{ 0, 1, 1, 0, 0 },{ 0, 0, 1, 0, 0 },{ 0, 0, 1, 0, 0 },{ 0, 0, 1, 0, 0 },{ 0, 0, 1, 0, 0 },{ 0, 1, 1, 1, 0 } }
 };
 
-void Countdown::setup(Display* display, NumericDisplay* numeric_displays)
+void Countdown::setup(Display* display, NumericDisplay* numeric_displays, Controller* controller)
 {
   _display = display;
   _numeric_displays = numeric_displays;
+  _controller = controller;
 
   reset();
 }
@@ -25,6 +26,15 @@ void Countdown::reset()
   _last_update = 0;
   _text_displayed = false;
   finished = false;
+
+  if (_controller->active_player == CONTROLLER_PLAYER1)
+  {
+    _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_TWIRL_SHORT);
+  }
+  else
+  {
+    _controller->set_light_state(CONTROLLER_PLAYER2, CONTROLLER_LIGHT_STATE_TWIRL_SHORT);
+  }
 }
 
 // Update logic for countdown state.

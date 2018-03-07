@@ -18,19 +18,20 @@ Menu            menu;
 
 // TODO: 
 //       - Tetris:  [IMP] Death screen: remove all lines one by one from the top
-//       - Tetris:  [IMP] Change Tetris to play against framebuffer (save memory) NOT POSSIBLE...
+//       - Tetris:  [IMP] Smaller memory footprint by putting 2 pixels in 1 byte
 //       - Tetris:  [NEW] Increase speed over time
-//       - Menu:    [NEW] Player selection after boot
-//       - General: [NEW] Rotate screen if player 2 is playing
+//       - Snake:   [BUG] Multiple dots appear after paying for a while (>35k score)
+//       - Snake:   [BUG] Changing orientation doesnt work
 //       - General: [IMP] Save RAM by moving data into single bytes?
 //       - General: [IMP] add more comments?
+//       - General: [IMP] Scoring for player 2
 
 void setup() 
 {
   display.setup();
   numeric_displays.setup();
   controller.setup();
-  countdown.setup(&display, &numeric_displays);
+  countdown.setup(&display, &numeric_displays, &controller);
 
   snake_game.start(&display, &numeric_displays, &controller, &countdown, &menu);
   tetris_game.start(&display, &numeric_displays, &controller, &countdown, &menu);

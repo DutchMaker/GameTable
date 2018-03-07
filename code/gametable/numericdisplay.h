@@ -12,9 +12,9 @@
 #define NUMERICDISPLAY_PLAYER1_PIN_CS  11
 #define NUMERICDISPLAY_PLAYER1_PIN_CLK 12
 
-#define NUMERICDISPLAY_PLAYER2_PIN_DIN 10
-#define NUMERICDISPLAY_PLAYER2_PIN_CS  11
-#define NUMERICDISPLAY_PLAYER2_PIN_CLK 12
+#define NUMERICDISPLAY_PLAYER2_PIN_DIN A0
+#define NUMERICDISPLAY_PLAYER2_PIN_CS  A1
+#define NUMERICDISPLAY_PLAYER2_PIN_CLK A2
 
 #define NUMERICDISPLAY_CHARACTER(index) (uint8_t)(pgm_read_byte(&characters[index]))
 
@@ -25,10 +25,10 @@ const static uint8_t characters [] PROGMEM = {
     B01111110,  // D
     B01001111,  // E
     B01000111,  // F
-    B00000000,  // G
+    B01011110,  // G
     B00110111,  // H
     B00110000,  // I
-    B00000000,  // J
+    B00111000,  // J
     B00000000,  // K
     B00001110,  // L
     B00000000,  // M
@@ -39,8 +39,8 @@ const static uint8_t characters [] PROGMEM = {
     B01000110,  // R
     B01011011,  // S
     B01000111,  // T
-    B00000000,  // U
-    B00000000,  // V
+    B01111010,  // U
+    B01111010,  // V
     B00000000,  // W
     B00000000,  // X
     B00110011,  // Y  

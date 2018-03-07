@@ -35,6 +35,8 @@ void Menu::show_menu()
   _numeric_displays->write(5, 'H');
   _numeric_displays->write(6, 'C');
 
+  _controller->set_light_state(_controller->active_player, CONTROLLER_LIGHT_STATE_TWIRL_LONG);
+
   _visible_state = true;
 }
 
@@ -84,36 +86,56 @@ void Menu::draw_options()
     }
   }
 
-  switch (_button_state++)
+  // Blink buttons
+  /*
+  if (_button_state == 0)
   {
-    case 0:
-      _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_BLINK_UP);
-      break;
-    case 1:
-      _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_BLINK_DOWN);
-      break;
-    case 2:
-      // Hardware bug: Player 1 blink right will actually blink the left button.
-      _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_BLINK_LEFT);
-      break;
+    _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_BLINK_UP);
+    _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_BLINK_DOWN);
+
+    _controller->set_light_state(CONTROLLER_PLAYER2, CONTROLLER_LIGHT_STATE_BLINK_UP);
+    _controller->set_light_state(CONTROLLER_PLAYER2, CONTROLLER_LIGHT_STATE_BLINK_DOWN);
+  }
+  else if (_button_state == 4)
+  {
+    _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_BLINK_LEFT);  // Hardware bug:
+                                                                                          // Player 1 blink right will actually blink the left button.
+    _controller->set_light_state(CONTROLLER_PLAYER2, CONTROLLER_LIGHT_STATE_BLINK_RIGHT);
   }
 
-  if (_button_state > 2)
+  if (++_button_state > 7)
   {
     _button_state = 0;
-  }
+  }*/
 
   _visible_state = !_visible_state;
 }
 
 void Menu::handle_input()
 {
-  int8_t button = _controller->take_button_from_queue(CONTROLLER_PLAYER1);
+  int8_t button_player1 = _controller->take_button_from_queue(CONTROLLER_PLAYER1);
+  int8_t button_player2 = _controller->take_button_from_queue(CONTROLLER_PLAYER2);
 
-  if (button == CONTROLLER_BIT_RIGHT) 
+  // Flip screen orientation
+  if (button_player1 > -1)
   {
-    _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_OFF);
+    _display->set_orientation(true);
+    _controller->active_player = CONTROLLER_PLAYER1;
+    
+    _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_TWIRL_LONG);
+    _controller->set_light_state(CONTROLLER_PLAYER2, CONTROLLER_LIGHT_STATE_OFF);
+  }
+  else if (button_player2 > -1)
+  {
+    _display->set_orientation(false);
+    _controller->active_player = CONTROLLER_PLAYER2;
 
+    _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_OFF);
+    _controller->set_light_state(CONTROLLER_PLAYER2, CONTROLLER_LIGHT_STATE_TWIRL_LONG);
+  }
+
+  if (button_player1 == CONTROLLER_BIT_RIGHT || button_player2 == CONTROLLER_BIT_RIGHT) 
+  {
     // Start selected game
     run_game = true;
     randomSeed(millis());
@@ -121,7 +143,7 @@ void Menu::handle_input()
     return;
   }
 
-  if (button == CONTROLLER_BIT_DOWN)  
+  if (button_player1 == CONTROLLER_BIT_DOWN || button_player2 == CONTROLLER_BIT_DOWN)  
   {
     // Select previous game
     selected_game++;
@@ -136,7 +158,7 @@ void Menu::handle_input()
     return;
   }
 
-  if (button == CONTROLLER_BIT_UP)  
+  if (button_player1 == CONTROLLER_BIT_UP || button_player2 == CONTROLLER_BIT_UP)  
   {
     // Select next game
     selected_game--;
