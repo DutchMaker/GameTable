@@ -10,6 +10,10 @@
 
 #define PONG_COLOR_PADDLE 1
 #define PONG_COLOR_BALL   3
+#define PONG_PADDLE_WIDTH 3
+
+#define PONG_COORD_X 0
+#define PONG_COORD_Y 1
 
 #define PONG_GAMESTATE_COUNTDOWN 1
 #define PONG_GAMESTATE_RUNNING   2
@@ -46,6 +50,7 @@ class PongGame
     uint8_t _game_state;    
     uint8_t _paddle_location[2][2];
     uint8_t _ball_location[2];
+    uint8_t _ball_velocity[2];
 
     unsigned long _score[2];
     unsigned long _score_last_update;

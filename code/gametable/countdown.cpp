@@ -25,9 +25,7 @@ void Countdown::reset()
   _countdown_state = -1;
   _last_update = 0;
   _text_displayed = false;
-  finished = false;
-
-  _controller->set_light_state(_controller->active_player, CONTROLLER_LIGHT_STATE_TWIRL_SHORT);
+  finished = false;  
 }
 
 // Update logic for countdown state.
@@ -46,6 +44,8 @@ void Countdown::update()
 
   if (!_text_displayed)
   {
+    _controller->set_light_state(_controller->active_player, CONTROLLER_LIGHT_STATE_TWIRL_SHORT);
+
     _numeric_displays->on();
     _numeric_displays->write(_controller->active_player, 1, 'Y');
     _numeric_displays->write(_controller->active_player, 2, 'D');

@@ -82,6 +82,9 @@ void TetrisGame::start_game()
   _last_displayed_score = -1;
   _score = 0;
 
+  _falling_speed = TETRIS_UPDATESPEED_FALLING;
+  _last_falling_speed_update = 0;
+
   _countdown->reset();
 
   create_new_piece();
@@ -133,7 +136,17 @@ void TetrisGame::update_game()
     _game_last_fall_update = millis();
   }
 
-  if (millis() - _game_last_fall_update > TETRIS_UPDATESPEED_FALLING)
+  if (millis() - _last_falling_speed_update > TETRIS_UPDATESPEED_INCREASE_FALLING)
+  {
+    if (_falling_speed > TETRIS_UPDATESPEED_FALLING_MINIMUM)
+    {
+      _falling_speed--;
+    }
+
+    _last_falling_speed_update = millis();
+  }
+
+  if (millis() - _game_last_fall_update > _falling_speed)
   {
     if (!move_down())
     {
@@ -158,10 +171,10 @@ void TetrisGame::update_countdown()
 
   if (_countdown->finished)
   {
-    _game_state = TETRIS_GAMESTATE_RUNNING;
-
     _controller->set_light_state(_controller->active_player, CONTROLLER_LIGHT_STATE_ON);
     _numeric_displays->on();
+
+    _game_state = TETRIS_GAMESTATE_RUNNING;
 
     start_game();
   }

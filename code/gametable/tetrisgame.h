@@ -14,9 +14,11 @@
 
 #define TETRIS_SCORE_PER_LINE 100
 
-#define TETRIS_UPDATESPEED_MOVEMENT   100
-#define TETRIS_UPDATESPEED_FALLING    400
-#define TETRIS_UPDATESPEED_DEAD_BLINK 200
+#define TETRIS_UPDATESPEED_MOVEMENT         100
+#define TETRIS_UPDATESPEED_FALLING          400
+#define TETRIS_UPDATESPEED_FALLING_MINIMUM  150
+#define TETRIS_UPDATESPEED_INCREASE_FALLING 4000
+#define TETRIS_UPDATESPEED_DEAD_BLINK       200
 
 class TetrisGame
 {
@@ -61,6 +63,9 @@ class TetrisGame
     unsigned long _game_last_fall_update;
     unsigned long _game_last_move_update;
     bool          _already_moved_down;
+    
+    uint16_t      _falling_speed;
+    unsigned long _last_falling_speed_update;
     
     long _score;
     long _last_displayed_score;

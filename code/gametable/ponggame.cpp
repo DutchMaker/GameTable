@@ -19,13 +19,13 @@ void PongGame::restart()
   _game_state = PONG_GAMESTATE_COUNTDOWN;
   
   // Set player 1 paddle X/Y
-  _paddle_location[CONTROLLER_PLAYER1][0] = 2;
-  _paddle_location[CONTROLLER_PLAYER1][1] = 0;
+  _paddle_location[CONTROLLER_PLAYER1][PONG_COORD_X] = 2;
+  _paddle_location[CONTROLLER_PLAYER1][PONG_COORD_Y] = 0;
 
   // Set player 2 paddle X/Y
-  _paddle_location[CONTROLLER_PLAYER2][0] = 6;
-  _paddle_location[CONTROLLER_PLAYER2][1] = 19;
-  
+  _paddle_location[CONTROLLER_PLAYER2][PONG_COORD_X] = 6;
+  _paddle_location[CONTROLLER_PLAYER2][PONG_COORD_Y] = 19;
+
   _display->clear_pixels();
 
   _controller->reset_queues();
@@ -42,9 +42,10 @@ void PongGame::start_game()
   _numeric_displays->on();
   _numeric_displays->set_values(0);
 
-  _display->clear_pixels();
+  _controller->active_player = CONTROLLER_PLAYER1;
+  _display->set_orientation(true);
 
-  //draw_snake();
+  _display->clear_pixels();
 }
 
 // Game loop.
@@ -126,7 +127,8 @@ void PongGame::update_done()
 
   if (millis() - _done_since > 1000)
   {
-    if (_controller->take_button_from_queue(CONTROLLER_PLAYER1) == CONTROLLER_BIT_UP)
+    if (_controller->take_button_from_queue(CONTROLLER_PLAYER1) == CONTROLLER_BIT_UP
+      || _controller->take_button_from_queue(CONTROLLER_PLAYER2) == CONTROLLER_BIT_UP)
     {
       restart();
       start_game();
@@ -146,18 +148,46 @@ void PongGame::update_done()
 
 void PongGame::handle_input()
 {
-  int8_t button = _controller->take_button_from_queue(CONTROLLER_PLAYER1);
+  int8_t button_player1 = _controller->take_button_from_queue(CONTROLLER_PLAYER1);
+  int8_t button_player2 = _controller->take_button_from_queue(CONTROLLER_PLAYER2);
 
-  if (button == CONTROLLER_BIT_RIGHT) // && _snake_direction != SNAKE_DIR_RIGHT && _snake_direction != SNAKE_DIR_LEFT)
+  if (button_player1 == CONTROLLER_BIT_RIGHT)
   {
-    //_snake_direction = SNAKE_DIR_RIGHT;
-    return;
+    // Move p1 right (from player point of view)
+    if (_paddle_location[CONTROLLER_PLAYER1][PONG_COORD_X] + PONG_PADDLE_WIDTH < DISPLAY_MATRIX_W)
+    {
+      _paddle_location[CONTROLLER_PLAYER1][PONG_COORD_X]++;
+    }
+  }
+  else if (button_player1 == CONTROLLER_BIT_LEFT)
+  {
+    // Move p1 left (from player point of view)
+    if (_paddle_location[CONTROLLER_PLAYER1][PONG_COORD_X] > 0)
+    {
+      _paddle_location[CONTROLLER_PLAYER1][PONG_COORD_X]--;
+    }
   }
 
-  if (button == CONTROLLER_BIT_LEFT) // && _snake_direction != SNAKE_DIR_LEFT && _snake_direction != SNAKE_DIR_RIGHT)
+  if (button_player2 == CONTROLLER_BIT_RIGHT)
   {
-    
-    return;
+    // Move p2 right (from player point of view)
+    if (_paddle_location[CONTROLLER_PLAYER2][PONG_COORD_X] > 0)
+    {
+      _paddle_location[CONTROLLER_PLAYER2][PONG_COORD_X]--;
+    }
+  }
+  else if (button_player2 == CONTROLLER_BIT_LEFT)
+  {
+    // Move p2 left (from player point of view)
+    if (_paddle_location[CONTROLLER_PLAYER2][PONG_COORD_X] + PONG_PADDLE_WIDTH < DISPLAY_MATRIX_W)
+    {
+      _paddle_location[CONTROLLER_PLAYER2][PONG_COORD_X]++;
+    }
+  }
+
+  if (button_player1 > -1 || button_player2 > -1)
+  {
+    _controller->reset_queues();
   }
 }
 
@@ -168,5 +198,15 @@ void PongGame::move_ball()
 
 void PongGame::draw_game_screen()
 {
+  _display->clear_pixels();
 
+  // Draw player paddles
+  for (uint8_t pixel = 0; pixel < PONG_PADDLE_WIDTH; pixel++)
+  {
+    _display->set_pixel(_paddle_location[CONTROLLER_PLAYER1][PONG_COORD_X] + pixel, _paddle_location[CONTROLLER_PLAYER1][PONG_COORD_Y], PONG_COLOR_PADDLE);
+    _display->set_pixel(_paddle_location[CONTROLLER_PLAYER2][PONG_COORD_X] + pixel, _paddle_location[CONTROLLER_PLAYER2][PONG_COORD_Y], PONG_COLOR_PADDLE);
+  }
+
+  // Draw ball
+  _display->set_pixel(_ball_location[PONG_COORD_X], _ball_location[PONG_COORD_Y], PONG_COLOR_BALL);
 }

@@ -17,12 +17,12 @@ Countdown       countdown;
 Menu            menu;
 
 // TODO: 
-//       - Tetris:  [IMP] Death screen: remove all lines one by one from the top
 //       - Tetris:  [IMP] Smaller memory footprint by putting 2 pixels in 1 byte
-//       - Tetris:  [NEW] Increase speed over time
 //       - Snake:   [BUG] Multiple dots appear after paying for a while (>35k score)
 //       - General: [IMP] Save RAM by moving data into single bytes?
 //       - General: [IMP] add more comments?
+//       - General: [IMP] Shortcut back to menu (press up/left/right at same time = enter dead state)
+//       - Pong:    [IMP] Take sideway velocity into account when bouncing ball
 
 void setup() 
 {
