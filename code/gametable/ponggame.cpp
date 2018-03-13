@@ -33,8 +33,11 @@ void PongGame::restart()
 
 void PongGame::start_game()
 {
-  _score[0] = 0;
-  _score[1] = 0;
+  _score_player1 = 0;
+  _score_player2 = 0;
+
+  _bullet_count[0] = 0;
+  _bullet_count[1] = 0;
 
   _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_ON);
   _controller->set_light_state(CONTROLLER_PLAYER2, CONTROLLER_LIGHT_STATE_ON);
@@ -77,15 +80,15 @@ void PongGame::update_game()
     _movement_last_update = millis();
   }
 
-  if (millis() - _ball_last_update > PONG_UPDATESPEED_BALL)
+  if (millis() - _bullets_last_update > PONG_UPDATESPEED_BULLETS)
   {
-    move_ball();    
-    _ball_last_update = millis();
+    move_bullets();
+    _bullets_last_update = millis();
   }
 
   if (millis() - _display_last_update > PONG_UPDATESPEED_DISPLAY)
   {
-    draw_game_screen();
+    draw_game();
     _display_last_update = millis();
   }
 }
@@ -167,6 +170,11 @@ void PongGame::handle_input()
       _paddle_location[CONTROLLER_PLAYER1][PONG_COORD_X]--;
     }
   }
+  else if (button_player1 == CONTROLLER_BIT_UP)
+  {
+    // Shoot a bullet from p1
+    new_bullet(CONTROLLER_PLAYER1);
+  }
 
   if (button_player2 == CONTROLLER_BIT_RIGHT)
   {
@@ -184,6 +192,11 @@ void PongGame::handle_input()
       _paddle_location[CONTROLLER_PLAYER2][PONG_COORD_X]++;
     }
   }
+  else if (button_player2 == CONTROLLER_BIT_UP)
+  {
+    // Shoot a bullet from p2
+    new_bullet(CONTROLLER_PLAYER2);
+  }
 
   if (button_player1 > -1 || button_player2 > -1)
   {
@@ -191,12 +204,63 @@ void PongGame::handle_input()
   }
 }
 
-void PongGame::move_ball()
+void PongGame::move_bullets()
 {
+  for (uint8_t player = 0; player < 2; player++)
+  {
+    if (_bullet_count[player] == 0)
+    {
+      continue;
+    }
 
+    int8_t velocity = 1 - (player * 2);
+    uint8_t enemy = player == CONTROLLER_PLAYER1 ? CONTROLLER_PLAYER2 : CONTROLLER_PLAYER1;
+
+    for (uint8_t bullet = 0; bullet < _bullet_count[player]; bullet++)
+    {
+      _bullets[player][bullet][PONG_COORD_Y] += velocity;
+
+      // Collission detection
+      if (_bullets[player][bullet][PONG_COORD_Y] == _paddle_location[enemy][PONG_COORD_Y])
+      {
+        if (_bullets[player][bullet][PONG_COORD_X] >= _paddle_location[enemy][PONG_COORD_X] && _bullets[player][bullet][PONG_COORD_X] < _paddle_location[enemy][PONG_COORD_X] + PONG_PADDLE_WIDTH)
+        {
+          // Hit
+          // TODO: Explosion animation.
+          if (player == CONTROLLER_PLAYER1)
+          {
+            _score_player1 += 1000;
+          }
+          else
+          {
+            _score_player2 += 1000;
+          }
+
+          _bullet_count[0] = 0;
+          _bullet_count[1] = 0;
+
+          _numeric_displays->set_value(_score_player1, 0);
+          _numeric_displays->set_value(_score_player2, 1);
+        }
+      }
+
+      if (_bullets[player][bullet][PONG_COORD_Y] < 0 || _bullets[player][bullet][PONG_COORD_Y] > DISPLAY_MATRIX_H - 1)
+      {
+        // Decrease number of bullets for player.
+        if (--_bullet_count[player] > 0)
+        {
+          for (uint8_t i = 0; i < _bullet_count[player]; i++)
+          {
+            _bullets[player][i][0] = _bullets[player][i + 1][0];
+            _bullets[player][i][1] = _bullets[player][i + 1][1];
+          }
+        }
+      }
+    }
+  }
 }
 
-void PongGame::draw_game_screen()
+void PongGame::draw_game()
 {
   _display->clear_pixels();
 
@@ -207,6 +271,37 @@ void PongGame::draw_game_screen()
     _display->set_pixel(_paddle_location[CONTROLLER_PLAYER2][PONG_COORD_X] + pixel, _paddle_location[CONTROLLER_PLAYER2][PONG_COORD_Y], PONG_COLOR_PADDLE);
   }
 
-  // Draw ball
-  _display->set_pixel(_ball_location[PONG_COORD_X], _ball_location[PONG_COORD_Y], PONG_COLOR_BALL);
+  // Draw bullets
+  for (uint8_t player = 0; player < 2; player++)
+  {
+    if (_bullet_count[player] == 0)
+    {
+      continue;
+    }
+
+    for (uint8_t bullet = 0; bullet < _bullet_count[player]; bullet++)
+    {
+      _display->set_pixel(_bullets[player][bullet][PONG_COORD_X], _bullets[player][bullet][PONG_COORD_Y], PONG_COLOR_BULLET);
+    }
+  }
+}
+
+void PongGame::new_bullet(uint8_t player)
+{
+  if (millis() - _newbullet_last_update[player] < PONG_UPDATESPEED_NEWBULLET)
+  {
+    return;
+  }
+
+  if (_bullet_count[player] < PONG_MAX_BULLETS)
+  {
+    _bullet_count[player]++;
+
+    int8_t velocity = 1 - (player * 2);
+
+    _bullets[player][_bullet_count[player] - 1][PONG_COORD_X] = _paddle_location[player][PONG_COORD_X] + 1;
+    _bullets[player][_bullet_count[player] - 1][PONG_COORD_Y] = _paddle_location[player][PONG_COORD_Y] + velocity;
+  }
+
+  _newbullet_last_update[player] = millis();
 }

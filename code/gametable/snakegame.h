@@ -48,7 +48,7 @@ class SnakeGame
     
     uint8_t _game_state;
     
-    unsigned long _score;
+    long          _score;
     unsigned long _score_last_update;
     
     uint8_t _snake[200][2];                      // Snake body parts (head is at [_snake_length] index of array)

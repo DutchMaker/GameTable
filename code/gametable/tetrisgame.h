@@ -57,7 +57,7 @@ class TetrisGame
     Countdown*      _countdown;
     Menu*           _menu;
 
-    uint8_t _field[DISPLAY_MATRIX_H][DISPLAY_MATRIX_W]; // Playing fields
+    uint8_t _field[DISPLAY_MATRIX_H][DISPLAY_MATRIX_W]; // Playing field
     
     uint8_t       _game_state;
     unsigned long _game_last_fall_update;

@@ -23,6 +23,7 @@ Menu            menu;
 //       - General: [IMP] add more comments?
 //       - General: [IMP] Shortcut back to menu (press up/left/right at same time = enter dead state)
 //       - Pong:    [IMP] Take sideway velocity into account when bouncing ball
+//                  Velocity & pos * 10 (120x200)
 
 void setup() 
 {
