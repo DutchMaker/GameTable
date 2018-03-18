@@ -58,6 +58,9 @@ class PongGame
     long          _score_player1;
     long          _score_player2;
     unsigned long _score_last_update;
+    uint8_t       _scoring_player;
+    uint8_t       _scoring_state;
+    uint8_t       _scoring_animation_particles[5][2];
 
     unsigned long _movement_last_update;
     unsigned long _bullets_last_update;

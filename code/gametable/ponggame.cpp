@@ -107,7 +107,102 @@ void PongGame::update_countdown()
 
 void PongGame::update_scored()
 {
+  if (millis() - _score_last_update < 100)
+  {
+    return;
+  }
 
+  if (_scoring_state == 0)
+  {
+    uint8_t i = 0;
+
+    for (uint8_t p = 0; p < 5; p++)
+    {
+      if (p == 2 || p == 3)
+      {
+        i++;
+      }
+
+      _scoring_animation_particles[p][0] = _paddle_location[!_scoring_player][0] + i;
+      _scoring_animation_particles[p][1] = _paddle_location[!_scoring_player][1];
+    }
+
+    _scoring_state++;
+  }
+  else if (_scoring_state >= 1 && _scoring_state <= 8)
+  {
+    int8_t delta = _scoring_player == CONTROLLER_PLAYER1 ? -1 : 1;
+
+    for (uint8_t p = 0; p < 5; p++)
+    {
+      if (p == 0)
+      {
+        _scoring_animation_particles[p][0] -= 1;
+      }
+      else if (p == 4)
+      {
+        _scoring_animation_particles[p][0] += 1;
+      }
+      else if (p == 1)
+      {
+        _scoring_animation_particles[p][0] -= _scoring_state % 2;
+        _scoring_animation_particles[p][1] += delta;
+      }
+      else if (p == 3)
+      {
+        _scoring_animation_particles[p][0] += _scoring_state % 2;
+        _scoring_animation_particles[p][1] += delta;
+      }
+      else if (p == 2)
+      {
+        _scoring_animation_particles[p][1] += delta * 2;
+      }
+    }
+
+    _scoring_state++;
+  }
+  else
+  {
+    if (_scoring_player == CONTROLLER_PLAYER1)
+    {
+      _score_player1 += 1000;
+    }
+    else
+    {
+      _score_player2 += 1000;
+    }
+
+    _bullet_count[0] = 0;
+    _bullet_count[1] = 0;
+
+    _numeric_displays->set_value(_score_player1, 0);
+    _numeric_displays->set_value(_score_player2, 1);
+
+    _game_state = PONG_GAMESTATE_RUNNING;
+    
+    if (_score_player1 >= 5000 || _score_player2 >= 5000)
+    {
+      _game_state = PONG_GAMESTATE_DONE;
+      _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_BLINK_UP);
+    }
+
+    return;
+  }
+
+  _display->clear_pixels();
+
+  for (uint8_t p = 0; p < 5; p++)
+  {
+    uint8_t x = _scoring_animation_particles[p][PONG_COORD_X];
+    uint8_t y = _scoring_animation_particles[p][PONG_COORD_Y];
+
+    if ((x >= 0 && x < DISPLAY_MATRIX_W) && (y >= 0 && y < DISPLAY_MATRIX_H))
+    {
+      _display->set_pixel(x, y, PONG_COLOR_PADDLE);
+    }
+  }
+
+  _score_last_update = millis();
 }
 
 // Update logic for dead game state.
@@ -226,21 +321,11 @@ void PongGame::move_bullets()
         if (_bullets[player][bullet][PONG_COORD_X] >= _paddle_location[enemy][PONG_COORD_X] && _bullets[player][bullet][PONG_COORD_X] < _paddle_location[enemy][PONG_COORD_X] + PONG_PADDLE_WIDTH)
         {
           // Hit
-          // TODO: Explosion animation.
-          if (player == CONTROLLER_PLAYER1)
-          {
-            _score_player1 += 1000;
-          }
-          else
-          {
-            _score_player2 += 1000;
-          }
+          _scoring_player = player;
+          _scoring_state = 0;
+          _game_state = PONG_GAMESTATE_SCORED;
 
-          _bullet_count[0] = 0;
-          _bullet_count[1] = 0;
-
-          _numeric_displays->set_value(_score_player1, 0);
-          _numeric_displays->set_value(_score_player2, 1);
+          return;
         }
       }
 
