@@ -10,8 +10,16 @@
 
 #define PONG_COLOR_PADDLE 1
 #define PONG_COLOR_BULLET 3
+#define PONG_COLOR_ARROW  5
 #define PONG_PADDLE_WIDTH 3
-#define PONG_MAX_BULLETS  3
+#define PONG_MAX_BULLETS  4
+
+#define PONG_MAX_SCORE      5000
+#define PONG_SCORE_PER_KILL 1000
+
+#define PONG_NUM_KILL_ANIMATION_PIXELS  5
+#define PONG_NUM_KILL_ANIMATION_FRAMES  7
+#define PONG_NUM_ARROW_PIXELS           15
 
 #define PONG_COORD_X 0
 #define PONG_COORD_Y 1
@@ -42,6 +50,8 @@ class PongGame
     void handle_input();
     void move_bullets();
     void draw_game();
+    void draw_paddle(uint8_t player);
+    void draw_arrow(uint8_t player);
     void new_bullet(uint8_t player);
     
     Display*        _display;
@@ -51,9 +61,9 @@ class PongGame
     Menu*           _menu;
 
     uint8_t _game_state;    
-    uint8_t _paddle_location[2][2]; // [player][x/y]
-    int8_t  _bullets[2][3][2];      // [player][bullet][x/y]
-    uint8_t _bullet_count[2];       // [player]
+    uint8_t _paddle_location[2][2];           // [player][x/y]
+    int8_t  _bullets[2][PONG_MAX_BULLETS][2]; // [player][bullet][x/y]
+    uint8_t _bullet_count[2];                 // [player]
 
     long          _score_player1;
     long          _score_player2;

@@ -17,13 +17,11 @@ Countdown       countdown;
 Menu            menu;
 
 // TODO: 
-//       - Tetris:  [IMP] Smaller memory footprint by putting 2 pixels in 1 byte
-//       - Snake:   [BUG] Multiple dots appear after paying for a while (>35k score)
+//       - Snake:   [BUG] Multiple dots appear after paying for a while (>35k score). Memory issue?
 //       - General: [IMP] Save RAM by moving data into single bytes?
-//       - General: [IMP] add more comments?
+//       - General: [IMP] Add more comments to code?
 //       - General: [IMP] Shortcut back to menu (press up/left/right at same time = enter dead state)
-//       - Pong:    [IMP] Take sideway velocity into account when bouncing ball
-//                  Velocity & pos * 10 (120x200)
+//       - General: [IMP] Add demo mode (show off cool LED effects)
 
 void setup() 
 {

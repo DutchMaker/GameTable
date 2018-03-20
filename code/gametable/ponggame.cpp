@@ -1,5 +1,29 @@
 #include "ponggame.h"
 
+// Macros for retrieving program memory data.
+#define PONG_DATA_KILL_ANIMATION(frame,pixel,xy) (uint8_t)(pgm_read_byte(&pong_data_kill_animation[frame][pixel][xy]))
+#define PONG_DATA_ARROW(pixel,xy) (uint8_t)(pgm_read_byte(&pong_data_arrow[pixel][xy]))
+
+// Definition of kill animation frames, stored in program memory.
+const PROGMEM uint8_t pong_data_kill_animation[7][5][2] = 
+{
+  { {-1, 0 }, {-1, 1 }, { 0, 1 }, { 1, 1 }, { 1, 0 } },
+  { {-1, 0 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 1, 0 } },
+  { {-1, 0 }, {-1, 1 }, { 0, 2 }, { 1, 1 }, { 1, 0 } },
+  { {-1, 0 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 1, 0 } },
+  { {-1, 0 }, {-1, 1 }, { 0, 1 }, { 1, 1 }, { 1, 0 } },
+  { {-1, 0 }, { 0, 1 }, { 0, 2 }, { 0, 1 }, { 1, 0 } },
+  { {-1, 0 }, {-1, 1 }, { 0, 1 }, { 1, 1 }, { 1, 0 } }
+};
+
+// Definition for arrow pixels, stored in program memory.
+const PROGMEM uint8_t pong_data_arrow[15][2] =
+{
+  { 3, 2 }, { 2, 3 }, { 3, 3 }, { 4, 3 }, { 1, 4 }, 
+  { 3, 4 }, { 5, 4 }, { 0, 5 }, { 3, 5 }, { 6, 5 }, 
+  { 3, 6 }, { 3, 7 }, { 3, 8 }, { 3, 9 }, { 3, 10 }
+};
+
 // Start Pong game.
 void PongGame::start(Display* display, NumericDisplay* numeric_displays, Controller* controller, Countdown* countdown, Menu* menu)
 {
@@ -114,9 +138,10 @@ void PongGame::update_scored()
 
   if (_scoring_state == 0)
   {
+    // Setup the particles used in the kill explosion.
     uint8_t i = 0;
 
-    for (uint8_t p = 0; p < 5; p++)
+    for (uint8_t p = 0; p < PONG_NUM_KILL_ANIMATION_PIXELS; p++)
     {
       if (p == 2 || p == 3)
       {
@@ -129,10 +154,20 @@ void PongGame::update_scored()
 
     _scoring_state++;
   }
-  else if (_scoring_state >= 1 && _scoring_state <= 8)
+  else if (_scoring_state >= 1 && _scoring_state <= PONG_NUM_KILL_ANIMATION_FRAMES)
   {
-    int8_t delta = _scoring_player == CONTROLLER_PLAYER1 ? -1 : 1;
+    // Move the particles used in the kill explosion.
+    int8_t deltaY = _scoring_player == CONTROLLER_PLAYER1 ? -1 : 1;
+    uint8_t frame = _scoring_state - 1;
 
+    for (uint8_t px = 0; px < PONG_NUM_KILL_ANIMATION_PIXELS; px++)
+    {
+      _scoring_animation_particles[px][0] += PONG_DATA_KILL_ANIMATION(frame, px, 0);
+      _scoring_animation_particles[px][1] += PONG_DATA_KILL_ANIMATION(frame, px, 1) * deltaY;
+    }
+
+    /*int8_t delta = _scoring_player == CONTROLLER_PLAYER1 ? -1 : 1;
+    
     for (uint8_t p = 0; p < 5; p++)
     {
       if (p == 0)
@@ -158,32 +193,35 @@ void PongGame::update_scored()
         _scoring_animation_particles[p][1] += delta * 2;
       }
     }
-
+    */
     _scoring_state++;
   }
   else
   {
+    // Update score and resume play
     if (_scoring_player == CONTROLLER_PLAYER1)
     {
-      _score_player1 += 1000;
+      _score_player1 += PONG_SCORE_PER_KILL;
     }
     else
     {
-      _score_player2 += 1000;
+      _score_player2 += PONG_SCORE_PER_KILL;
     }
 
     _bullet_count[0] = 0;
     _bullet_count[1] = 0;
 
-    _numeric_displays->set_value(_score_player1, 0);
-    _numeric_displays->set_value(_score_player2, 1);
+    _numeric_displays->set_value(_score_player1, CONTROLLER_PLAYER1);
+    _numeric_displays->set_value(_score_player2, CONTROLLER_PLAYER2);
 
     _game_state = PONG_GAMESTATE_RUNNING;
     
-    if (_score_player1 >= 5000 || _score_player2 >= 5000)
+    if (_score_player1 >= PONG_MAX_SCORE || _score_player2 >= PONG_MAX_SCORE)
     {
       _game_state = PONG_GAMESTATE_DONE;
+      
       _controller->set_light_state(CONTROLLER_PLAYER1, CONTROLLER_LIGHT_STATE_BLINK_UP);
+      _controller->set_light_state(CONTROLLER_PLAYER2, CONTROLLER_LIGHT_STATE_BLINK_UP);
     }
 
     return;
@@ -191,14 +229,16 @@ void PongGame::update_scored()
 
   _display->clear_pixels();
 
-  for (uint8_t p = 0; p < 5; p++)
+  draw_paddle(_scoring_player);
+
+  for (uint8_t p = 0; p < PONG_NUM_KILL_ANIMATION_PIXELS; p++)
   {
     uint8_t x = _scoring_animation_particles[p][PONG_COORD_X];
     uint8_t y = _scoring_animation_particles[p][PONG_COORD_Y];
 
     if ((x >= 0 && x < DISPLAY_MATRIX_W) && (y >= 0 && y < DISPLAY_MATRIX_H))
     {
-      _display->set_pixel(x, y, PONG_COLOR_PADDLE);
+      _display->set_pixel(x, y, PONG_COLOR_BULLET);
     }
   }
 
@@ -216,11 +256,13 @@ void PongGame::update_done()
   // Blink arrow towards winning player.
   if (_done_update_state)
   {
-    // draw_arrow();
+    draw_arrow(_scoring_player);
+    draw_paddle(_scoring_player);
   }
   else
   {
     _display->clear_pixels();
+    draw_paddle(_scoring_player);
   }
 
   if (millis() - _done_since > 1000)
@@ -350,11 +392,8 @@ void PongGame::draw_game()
   _display->clear_pixels();
 
   // Draw player paddles
-  for (uint8_t pixel = 0; pixel < PONG_PADDLE_WIDTH; pixel++)
-  {
-    _display->set_pixel(_paddle_location[CONTROLLER_PLAYER1][PONG_COORD_X] + pixel, _paddle_location[CONTROLLER_PLAYER1][PONG_COORD_Y], PONG_COLOR_PADDLE);
-    _display->set_pixel(_paddle_location[CONTROLLER_PLAYER2][PONG_COORD_X] + pixel, _paddle_location[CONTROLLER_PLAYER2][PONG_COORD_Y], PONG_COLOR_PADDLE);
-  }
+  draw_paddle(CONTROLLER_PLAYER1);
+  draw_paddle(CONTROLLER_PLAYER2);
 
   // Draw bullets
   for (uint8_t player = 0; player < 2; player++)
@@ -367,6 +406,36 @@ void PongGame::draw_game()
     for (uint8_t bullet = 0; bullet < _bullet_count[player]; bullet++)
     {
       _display->set_pixel(_bullets[player][bullet][PONG_COORD_X], _bullets[player][bullet][PONG_COORD_Y], PONG_COLOR_BULLET);
+    }
+  }
+}
+
+void PongGame::draw_paddle(uint8_t player)
+{
+  for (uint8_t pixel = 0; pixel < PONG_PADDLE_WIDTH; pixel++)
+  {
+    _display->set_pixel(_paddle_location[player][PONG_COORD_X] + pixel, _paddle_location[player][PONG_COORD_Y], PONG_COLOR_PADDLE);
+  }
+}
+
+// Draw arrow towards player paddle.
+void PongGame::draw_arrow(uint8_t player)
+{
+  uint8_t deltaX = _paddle_location[player][PONG_COORD_X] - 2;
+
+  for (uint8_t px = 0; px < PONG_NUM_ARROW_PIXELS; px++)
+  {
+    uint8_t x = PONG_DATA_ARROW(px, PONG_COORD_X) + deltaX;
+    uint8_t y = PONG_DATA_ARROW(px, PONG_COORD_Y);
+
+    if (player == CONTROLLER_PLAYER2)
+    {
+      y = DISPLAY_MATRIX_H - y - 1;
+    }
+
+    if ((x >= 0 && x < DISPLAY_MATRIX_W) && (y >= 0 && y < DISPLAY_MATRIX_H))
+    {
+      _display->set_pixel(x, y, PONG_COLOR_ARROW);
     }
   }
 }
